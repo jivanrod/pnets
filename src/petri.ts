@@ -1,4 +1,4 @@
-/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../typings/main.d.ts" />
 
 import _ = require('lodash');
 import events = require('events');
@@ -91,7 +91,7 @@ module petri {
 
 		enabled(): boolean {
 			var places = <Place[]> this.inputs();
-			
+
 			var placeHasToken = function(p: Place): boolean {
 				return p.tokens > 0;
 			};

@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "out": ".dist/pnet.js",
+        "sourceMap": true
+    },
+    "files": [
+        "./src/petri.ts"
+    ]
+}

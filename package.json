@@ -1,25 +1,25 @@
 {
-  "name": "petri-net",
-  "version": "0.2.1",
+  "name": "pnets",
+  "version": "0.0.1",
   "description": "Petri Net modelling and execution",
-  "homepage": "https://github.com/warrenseymour/petri-net",
+  "homepage": "https://github.com/smamessier/pnets",
   "bugs": {
-    "url": "https://github.com/warrenseymour/petri-net/issues"
+    "url": "https://github.com/smamessier/pnets/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/warrenseymour/petri-net.git"
+    "url": "https://github.com/smamessier/pnets.git"
   },
   "main": "dist/petri.js",
   "scripts": {
     "test": "gulp test"
   },
   "author": {
-    "name": "Warren Seymour",
-    "email": "warren@radify.io",
-    "url": "http://radify.io"
+    "name": "Sebastien Mamessier",
+    "email": "s.mamessier@gmail.com",
+    "url": "http://phd.mamessier.com"
   },
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "lodash": "~2.4.1"
   },
@@ -32,7 +32,6 @@
     "gulp-concat": "~2.4.2",
     "gulp-coverage": "~0.3.32",
     "gulp-plumber": "~0.6.6",
-    "event-stream": "~3.2.1",
-    "tsd": "~0.6.0-beta.5"
+    "event-stream": "~3.2.1"
   }
 }

@@ -1,5 +1,5 @@
-# Petri-Net v0.2.1
-A simple library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net).
+# Pnets v 0.0
+A simple library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net) inspired and forked from [warrenseymour/petri-net](warrenseymour/petri-net) written in TypeScript.
 
 ## Features
 - Representation of simple Nets using token counters
