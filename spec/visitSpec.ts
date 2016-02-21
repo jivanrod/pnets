@@ -1,7 +1,4 @@
-/// <reference path="../typings/tsd.d.ts" />
-/// <reference path="petri.d.ts" />
-
-import petri = require('./petri');
+import petri = require('pnets');
 
 describe("visit()", () => {
 	describe('flat sequence', () => {

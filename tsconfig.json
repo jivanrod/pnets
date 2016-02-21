@@ -1,13 +1,57 @@
 {
     "compilerOptions": {
+        "target": "es5",
         "module": "commonjs",
-        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "isolatedModules": false,
+        "jsx": "react",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "declaration": true,
+        "noImplicitAny": false,
         "removeComments": true,
+        "noLib": false,
         "preserveConstEnums": true,
-        "out": ".dist/pnet.js",
-        "sourceMap": true
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "./dist/"
     },
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx",
+        "!node_modules/**"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": true,
     "files": [
-        "./src/petri.ts"
-    ]
+        "dist/example.d.ts",
+        "dist/spec/arcSpec.d.ts",
+        "dist/spec/netSpec.d.ts",
+        "dist/spec/node/placeSpec.d.ts",
+        "dist/spec/node/transitionSpec.d.ts",
+        "dist/spec/nodeSpec.d.ts",
+        "dist/spec/visitSpec.d.ts",
+        "dist/src/petri.d.ts",
+        "example.ts",
+        "spec/arcSpec.ts",
+        "spec/netSpec.ts",
+        "spec/node/placeSpec.d.ts",
+        "spec/node/placeSpec.ts",
+        "spec/node/transitionSpec.ts",
+        "spec/nodeSpec.ts",
+        "spec/visitSpec.ts",
+        "src/petri.ts",
+        "typings/browser.d.ts",
+        "typings/browser/ambient/jasmine/jasmine.d.ts",
+        "typings/browser/ambient/lodash/lodash.d.ts",
+        "typings/browser/ambient/node/node.d.ts",
+        "typings/browser/definitions/pnets/pnets.d.ts",
+        "typings/main.d.ts",
+        "typings/main/ambient/jasmine/jasmine.d.ts",
+        "typings/main/ambient/lodash/lodash.d.ts",
+        "typings/main/ambient/node/node.d.ts",
+        "typings/main/definitions/pnets/pnets.d.ts"
+    ],
+    "atom": {
+        "rewriteTsconfig": true
+    }
 }

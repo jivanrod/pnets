@@ -1,5 +1,3 @@
-/// <reference path="../typings/main.d.ts" />
-
 import _ = require('lodash');
 import events = require('events');
 

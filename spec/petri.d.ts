@@ -1,1 +1,0 @@
-../dist/petri.d.ts
