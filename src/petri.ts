@@ -34,11 +34,11 @@ module petri {
 		}
 
 		inputs() {
-			return _.pluck(this.inputArcs, 'input');
+			return _.map(this.inputArcs, 'input');
 		}
 
 		outputs() {
-			return _.pluck(this.outputArcs, 'output');
+			return _.map(this.outputArcs, 'output');
 		}
 
 		describe(): NodeDescription {
@@ -76,7 +76,7 @@ module petri {
 			return <PlaceDescription> _.extend(super.describe(), {
 				type: 'place',
 				tokens: this.tokens,
-				transitions: _.pluck(this.outputs(), 'name')
+				transitions: _.map(this.outputs(), 'name')
 			});
 		}
 	}
@@ -122,7 +122,7 @@ module petri {
 		describe(): TransitionDescription {
 			return <TransitionDescription> _.extend(super.describe(), {
 				type: 'transition',
-				places: _.pluck(this.outputs(), 'name')
+				places: _.map(this.outputs(), 'name')
 			});
 		}
 	}
@@ -173,7 +173,7 @@ module petri {
 	}
 
 	export function visit(start: Place, result: VisitResult = { places: [], transitions: [] }) : VisitResult {
-		if (_.contains(result.places, start)) {
+		if (_.includes(result.places, start)) {
 			return result;
 		}
 
@@ -188,7 +188,7 @@ module petri {
 		result.transitions = result.transitions.concat(transitions);
 
 		_.each(transitions, (transition) => {
-			_.each(transition.outputs(), (place) => {
+			_.each(transition.outputs(), (place: Place) => {
 				visit(place, result);
 			});
 		});

@@ -15,11 +15,6 @@
         "suppressImplicitAnyIndexErrors": true,
         "outDir": "./dist/"
     },
-    "filesGlob": [
-        "**/*.ts",
-        "**/*.tsx",
-        "!node_modules/**"
-    ],
     "compileOnSave": true,
     "buildOnSave": true,
     "files": [
@@ -40,11 +35,6 @@
         "spec/nodeSpec.ts",
         "spec/visitSpec.ts",
         "src/petri.ts",
-        "typings/browser.d.ts",
-        "typings/browser/ambient/jasmine/jasmine.d.ts",
-        "typings/browser/ambient/lodash/lodash.d.ts",
-        "typings/browser/ambient/node/node.d.ts",
-        "typings/browser/definitions/pnets/pnets.d.ts",
         "typings/main.d.ts",
         "typings/main/ambient/jasmine/jasmine.d.ts",
         "typings/main/ambient/lodash/lodash.d.ts",
