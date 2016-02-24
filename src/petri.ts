@@ -91,11 +91,11 @@ module petri {
 			super(name);
 
 			inputs.forEach((input) => {
-				new Arc(input, this);
+				new Arc(input, this, 1);
 			});
 
 			outputs.forEach((output) => {
-				new Arc(this, output);
+				new Arc(this, output, 1);
 			});
 		}
 
