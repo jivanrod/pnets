@@ -1,12 +1,24 @@
 import _ = require('lodash');
 import events = require('events');
 
+/**
+* Petri nets module
+* @preferred
+*/
 module petri {
 	export class Arc {
-		constructor(public input: Node, public output: Node) {
+		constructor(public input: Node, public output: Node, m: number) {
 			input.outputArcs.push(this);
 			output.inputArcs.push(this);
 		}
+	}
+
+	export class Token {
+		constructor(type: string){
+			this.type = type;
+		}
+
+		public type: string = 'default'
 	}
 
 	export interface NodeDescription {
