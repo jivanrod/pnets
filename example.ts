@@ -1,10 +1,9 @@
-/// <reference path="typings/tsd.d.ts" />
 var _ = require('lodash');
 require('source-map-support').install();
 
-import Transition = require('./src/connectable/Transition');
-import Place = require('./src/connectable/Place');
-import Net = require('./src/Net');
+import {Transition} from 'pnets';
+import {Place} from 'pnets';
+import {Net} from 'pnets';
 
 var p1 = new Place('p1'),
 	p2 = new Place('p2'),
