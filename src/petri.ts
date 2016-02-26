@@ -32,6 +32,7 @@ module petri {
 	export class Node extends events.EventEmitter {
 		public inputArcs: Arc[] = [];
 		public outputArcs: Arc[] = [];
+		public obs: Rx.Observable<any> = null;
 
 		constructor(public name: string) {
 			super();
@@ -58,22 +59,41 @@ module petri {
 	}
 
 	export class Place extends Node {
-		public tokens: number = 0;
+		public tokens: Token[] = [];
 
 		constructor(public name: string) {
 			super(name);
+			this.obs = Rx.Observable.defer( () => Rx.Observable.create( (observer) => {
+				// Iterating over input arc
+				_.forEach(this.inputArcs, (arc: Arc) => {
+					// Subscribe to nodes
+					arc.inputNode.obs.subscribe(
+						(x: Token[]) => {
+							this.tokens = _.concat(this.tokens,x);
+							observer.onNext(true);
+						},
+						(err) => {
+							console.error(err);
+						},
+						() => {
+							console.log("Done");
+						}
+					)
+				})
+			}));
 		}
 
 		consume() {
-			if (this.tokens < 1) {
+			/*if (this.tokens < 1) {
 				return;
-			}
+			}*/
+			return;
 
-			this.tokens -= 1;
+			//this.tokens -= 1;
 		}
 
 		produce() {
-			this.tokens += 1;
+			//this.tokens += 1;
 		}
 
 		describe(): PlaceDescription {
@@ -82,6 +102,15 @@ module petri {
 				tokens: this.tokens,
 				transitions: _.map(this.outputs(), 'name')
 			});
+		}
+	}
+
+	/**
+	* Places with spontaneous token generation based on condition.
+	*/
+	export class ConditionalPlace extends Place {
+		constructor(public name: string){
+			super(name)
 		}
 	}
 
@@ -107,7 +136,7 @@ module petri {
 			var places = <Place[]> this.inputs();
 
 			var placeHasToken = function(p: Place): boolean {
-				return p.tokens > 0;
+				return p.tokens.length > 0;
 			};
 
 			return _.filter(places, placeHasToken).length === places.length;
@@ -143,7 +172,7 @@ module petri {
 		}
 
 		ingest(count: number = 1) {
-			this.start.tokens += count;
+			//this.start.tokens += count;
 		}
 
 		execute() {
