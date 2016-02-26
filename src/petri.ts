@@ -9,9 +9,11 @@ module petri {
 	export class Arc {
 		public inputNode: Node = null;
 		public outputNode: Node = null;
+		public m: number = 1;
 		constructor(public input: Node, public output: Node, m: number) {
 			this.inputNode = input;
 			this.outputNode = output;
+			this.m = m;
 			input.outputArcs.push(this);
 			output.inputArcs.push(this);
 		}
@@ -119,27 +121,44 @@ module petri {
 		enabled: boolean;
 	}
 
-	export class Transition extends Node {
-		constructor(public name: string, inputs: Place[], outputs: Place[]) {
+	export abstract class Transition extends Node {
+		constructor(public name: string) {
 			super(name);
 
-			inputs.forEach((input) => {
-				new Arc(input, this, 1);
-			});
-
-			outputs.forEach((output) => {
-				new Arc(this, output, 1);
-			});
+			this.obs = Rx.Observable.defer( () => Rx.Observable.create( (observer) => {
+				// Iterating over input arc
+				_.forEach(this.inputArcs, (arc: Arc) => {
+					// Subscribe to nodes
+					arc.inputNode.obs.subscribe(
+						(x: boolean) => {
+							// Iterating across input nodes to check firing
+							if (this.enabled()){
+								this.fire();
+							}
+						},
+						(err) => {
+							console.error(err);
+						},
+						() => {
+							console.log("Done");
+						}
+					)
+				})
+			}));
 		}
 
+		/**
+		* Checks whether preconditions are filled for firing
+		* @return boolean
+		*/
 		enabled(): boolean {
-			var places = <Place[]> this.inputs();
 
-			var placeHasToken = function(p: Place): boolean {
-				return p.tokens.length > 0;
-			};
-
-			return _.filter(places, placeHasToken).length === places.length;
+			var enable = true;
+			_.forEach(this.inputArcs, (arc: Arc) => {
+				var node = <Place>arc.inputNode;
+				enable = enable && (node.tokens.length == arc.m);
+			});
+			return enable;
 		}
 
 		fire() {
@@ -151,6 +170,12 @@ module petri {
 			_.each(this.outputs(), (p: Place) => p.produce());
 			this.emit('fire');
 		}
+
+		/**
+		* Abstract method for non-instantaneous task execution
+		* @return Returns RxJS observable resolving the task executiong 
+		*/
+		abstract execute(): Rx.Observable<any>;
 
 		describe(): TransitionDescription {
 			return <TransitionDescription> _.extend(super.describe(), {
