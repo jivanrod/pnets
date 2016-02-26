@@ -3,8 +3,9 @@
   "ambientDependencies": {
     "jasmine": "github:DefinitelyTyped/DefinitelyTyped/jasmine/jasmine.d.ts",
     "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts#7b7aa2027a8fb6219a8bcf1b6bb12bcd0ff9539d",
-    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts"
-  },
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts",
+    "rx": "file:./node_modules/rx/ts/rx.d.ts"
+},
   "dependencies": {
     "pnets": "file:./dist/src/petri.d.ts"
   }

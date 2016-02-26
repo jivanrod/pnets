@@ -17,6 +17,14 @@
     },
     "compileOnSave": true,
     "buildOnSave": true,
+    "filesGlob": [
+        "**/*.ts",
+        "**/*.tsx",
+        "!node_modules/**",
+        "!typings/browser/**",
+        "!typings/browser.d.ts",
+        "!typings/main/**"
+    ],
     "files": [
         "dist/example.d.ts",
         "dist/spec/arcSpec.d.ts",
@@ -35,11 +43,7 @@
         "spec/nodeSpec.ts",
         "spec/visitSpec.ts",
         "src/petri.ts",
-        "typings/main.d.ts",
-        "typings/main/ambient/jasmine/jasmine.d.ts",
-        "typings/main/ambient/lodash/lodash.d.ts",
-        "typings/main/ambient/node/node.d.ts",
-        "typings/main/definitions/pnets/pnets.d.ts"
+        "typings/main.d.ts"
     ],
     "atom": {
         "rewriteTsconfig": true
