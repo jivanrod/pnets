@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/smamessier/pnets.git"
   },
-  "main": "dist/petri.js",
+  "main": "dist/src/petri.js",
   "scripts": {
     "test": "gulp test"
   },
@@ -22,7 +22,8 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "~2.4.1",
-    "rx": "^4.0.8"
+    "rx": "^4.0.8",
+    "xml2js": "^0.4.16"
   },
   "devDependencies": {
     "source-map-support": "~0.2.8",
