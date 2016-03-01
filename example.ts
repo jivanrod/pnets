@@ -1,24 +1,13 @@
 var _ = require('lodash');
 require('source-map-support').install();
 
-import {Transition} from 'pnets';
 import {Place} from 'pnets';
 import {Net} from 'pnets';
+import fs = require('fs');
 
 var p1 = new Place('p1'),
 	p2 = new Place('p2'),
 	p3 = new Place('p3');
 
-var t1 = new Transition('t1', [p1], [p2]),
-	t2 = new Transition('t2', [p2], [p3]);
-
-var net = new Net(p1);
-net.ingest(10);
-
-net.summary();
-
-_.times(11, function(n) {
-	console.log("Iteration " + n);
-	net.execute();
-	net.summary();
-});
+var xmlString = fs.readFileSync('test.xml','utf8');
+var net = Net.fromPnml(xmlString);
