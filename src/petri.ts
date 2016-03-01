@@ -1,6 +1,7 @@
 import _ = require('lodash');
 import events = require('events');
 import Rx = require('rx');
+import xml2js = require('xml2js');
 /**
 * Petri nets module
 * @preferred
@@ -173,7 +174,7 @@ module petri {
 
 		/**
 		* Abstract method for non-instantaneous task execution
-		* @return Returns RxJS observable resolving the task executiong 
+		* @return Returns RxJS observable resolving the task executiong
 		*/
 		abstract execute(): Rx.Observable<any>;
 
@@ -189,11 +190,11 @@ module petri {
 		transitions: Transition[];
 		places: Place[];
 
-		constructor(private start: Place) {
-			var visitResult = visit(this.start);
+		constructor() {
+			//var visitResult = visit(this.start);
 
-			this.transitions = visitResult.transitions;
-			this.places = visitResult.places;
+			this.transitions = [];//visitResult.transitions;
+			this.places = [];//visitResult.places;
 		}
 
 		ingest(count: number = 1) {
@@ -222,6 +223,17 @@ module petri {
 			});
 
 			return [].concat(places, transitions);
+		}
+
+		/**
+		* Static function to create Net from Pnml
+		*/
+		static fromPnml(xmlString: string): Net {
+			var net = new Net();
+			xml2js.parseString(xmlString, (err, results) => {
+				console.log(JSON.stringify(results, null,2));
+			});
+			return net;
 		}
 	}
 
@@ -253,6 +265,7 @@ module petri {
 
 		return result;
 	}
+
 }
 
 export = petri;
