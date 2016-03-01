@@ -13,7 +13,7 @@
         "noLib": false,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
-        "outDir": "./dist/"
+        "outDir": "./dist"
     },
     "compileOnSave": true,
     "buildOnSave": true,
@@ -23,7 +23,8 @@
         "!node_modules/**",
         "!typings/browser/**",
         "!typings/browser.d.ts",
-        "!typings/main/**"
+        "!typings/main/**",
+        "!spec/**"
     ],
     "files": [
         "dist/example.d.ts",
@@ -34,14 +35,9 @@
         "dist/spec/nodeSpec.d.ts",
         "dist/spec/visitSpec.d.ts",
         "dist/src/petri.d.ts",
+        "example.d.ts",
         "example.ts",
-        "spec/arcSpec.ts",
-        "spec/netSpec.ts",
-        "spec/node/placeSpec.d.ts",
-        "spec/node/placeSpec.ts",
-        "spec/node/transitionSpec.ts",
-        "spec/nodeSpec.ts",
-        "spec/visitSpec.ts",
+        "src/petri.d.ts",
         "src/petri.ts",
         "typings/main.d.ts"
     ],
