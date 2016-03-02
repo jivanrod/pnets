@@ -12,8 +12,7 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "outDir": "./dist"
+        "suppressImplicitAnyIndexErrors": true
     },
     "compileOnSave": true,
     "buildOnSave": true,
@@ -23,22 +22,17 @@
         "!node_modules/**",
         "!typings/browser/**",
         "!typings/browser.d.ts",
-        "!typings/main/**",
-        "!spec/**"
+        "!typings/main/**"
     ],
     "files": [
         "dist/example.d.ts",
-        "dist/spec/arcSpec.d.ts",
-        "dist/spec/netSpec.d.ts",
-        "dist/spec/node/placeSpec.d.ts",
-        "dist/spec/node/transitionSpec.d.ts",
-        "dist/spec/nodeSpec.d.ts",
-        "dist/spec/visitSpec.d.ts",
         "dist/src/petri.d.ts",
         "example.d.ts",
         "example.ts",
         "src/petri.d.ts",
         "src/petri.ts",
+        "test/ImportTest.d.ts",
+        "test/ImportTest.ts",
         "typings/main.d.ts"
     ],
     "atom": {

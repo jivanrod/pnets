@@ -231,7 +231,7 @@ module petri {
 		static fromPnml(xmlString: string): Net {
 			var net = new Net();
 			xml2js.parseString(xmlString, (err, results) => {
-				console.log(JSON.stringify(results, null,2));
+				
 			});
 			return net;
 		}
