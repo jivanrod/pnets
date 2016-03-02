@@ -13,12 +13,12 @@ module petri {
 		public inputNode: Node = null;
 		public outputNode: Node = null;
 		public m: number = 1;
-		constructor(public input: Node, public output: Node, m: number) {
+		constructor(input: Node, output: Node, m: number) {
 			this.inputNode = input;
 			this.outputNode = output;
 			this.m = m;
-			input.outputArcs.push(this);
-			output.inputArcs.push(this);
+			this.inputNode.outputArcs.push(this);
+			this.outputNode.inputArcs.push(this);
 		}
 	}
 
@@ -227,14 +227,55 @@ module petri {
 	}
 
 	export class Net {
-		transitions: Transition[];
-		places: Place[];
+		transitions: Transition[] = [];
+		places: Place[] = [];
+		arcs: Arc[] = [];
 
 		constructor() {
-			//var visitResult = visit(this.start);
+		}
 
-			this.transitions = [];//visitResult.transitions;
-			this.places = [];//visitResult.places;
+		/**
+		* Finds and returns node in existing net
+		* @param nodeId ID of the node
+		* @return Returns object with handle to the node and node type if found, undefined otherwise
+		*/
+		findNode(nodeId: string): { node: Node, type: string } {
+			var checkP = _.find(this.places, (p) => { return p.name == nodeId});
+			// If node found in places array
+			if (checkP !== undefined){
+				return {
+					node: checkP,
+					type: 'place'
+				}
+			}
+			// Else, check transitions
+			var checkT = _.find(this.transitions, (t) => { return t.name == nodeId});
+			if (checkT !== undefined){
+				return {
+					node: checkT,
+					type: 'transition'
+				}
+			}
+			// If neither place nor transition, return undefined
+			return undefined;
+		}
+
+		/**
+		* Adds arc with multiplicity
+		* @param sourceId Id of the source node
+		* @param targetId Id of the target node
+		* @param m Multiplicity of the arc
+		*/
+		addArc(sourceId: string, targetId: string, m: number) {
+			console.log("Adding arc between "+sourceId+" and "+targetId);
+			var source = this.findNode(sourceId);
+			var target = this.findNode(targetId);
+			if (source === undefined) { throw new Error("Source node not found")};
+			if (target === undefined) { throw new Error("Target node not found")};
+			if (source.type == target.type){
+				throw new Error("Can't create arc between two nodes of same type");
+			}
+			this.arcs.push(new Arc(source.node, target.node, m));
 		}
 
 		ingest(count: number = 1) {
@@ -277,6 +318,12 @@ module petri {
 				var transitions = results['pnml']['net'][0]['transition'];
 				_.forEach(transitions, (t) => {
 					net.transitions.push(new TimedTransition(t['$']['id'],1));
+				});
+				// Importing arcs
+				console.log(net.places);
+				var arcs = results['pnml']['net'][0]['arc'];
+				_.forEach(arcs, (arc) => {
+					net.addArc(arc['$']['source'],arc['$']['target'],1);
 				});
 			});
 			return net;

@@ -25,9 +25,6 @@
         "!typings/main/**"
     ],
     "files": [
-        "example.d.ts",
-        "example.ts",
-        "src/petri.d.ts",
         "src/petri.ts",
         "test/ImportTest.d.ts",
         "test/ImportTest.ts",
