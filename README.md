@@ -1,41 +1,29 @@
-# Pnets v 0.0
-A simple library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net) inspired and forked from [warrenseymour/petri-net](warrenseymour/petri-net) written in TypeScript.
+# Pnets v 0.1
+A library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net). Initially inspired from  inspired and forked from [warrenseymour/petri-net](warrenseymour/petri-net), it has little to do with the initial
+library. TypeScript has be kept as the development language for scalability purposes.
 
 ## Features
-- Representation of simple Nets using token counters
-- Typescript implementation
-- OO paradigm
-- Emit Events when Transitions are fired
+- Representation of petri nets
+- Places, Transitions, Tokens, Arcs with multiplicity
+- Use of RXJS observable pattern for asynchronous events handling
 
 ## Roadmap
 - Weighted Arcs
-- Adopt functional paradigm/immutable data
-- Persist Nets and state to storage backend
+- Import from PNML format
 - Extensions such as Coloured, Timed and Hierarchical Nets
-- Stepwise replay and analysis of previous executions
 
 ## Usage
 
-```javascript
-var petri = require('petri-net'),
-	_ = require('lodash');
+Todo
 
-var p1 = new petri.Place('p1'),
-	p2 = new petri.Place('p2'),
-	p3 = new petri.Place('p3'),
+## Development
 
-	t1 = new petri.Transition('t1', [p1], [p2, p3]),
-
-	net = new petri.Net(p1);
-
-net.ingest(10);
-t1.on('fire', function() {
-	console.log('t1 fired');
-});
-
-_.times(5, function() {
-	console.log(net.describe());
-	console.log('----');
-	net.execute();
-});
+Clone this repository, install npm dependencies and TypeScript declarations.
+```bash
+npm install
+typings install
+```
+### Run test suite
+```bash
+npm test
 ```
