@@ -1,5 +1,5 @@
 /// <reference path="../typings/main.d.ts" />
-import {Net} from 'pnets';
+import {Net} from '../src/petri';
 import fs = require('fs');
 var xmlString = fs.readFileSync('test.xml','utf8');
 
@@ -11,7 +11,7 @@ describe('PNML Import', () => {
   })
 
   it ('should load the XML in a Javascript object', () => {
-    console.log(JSON.stringify(net, null,2));
+    console.log(net);
     if (!net){
       throw new Error('XML import failed');
     }
