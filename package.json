@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/smamessier/pnets.git"
   },
-  "main": "dist/src/petri.js",
+  "main": "src/petri.js",
   "scripts": {
     "pretest": "tsc",
     "test": "mocha"
@@ -22,6 +22,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "es6-promise": "^3.1.2",
     "lodash": "~2.4.1",
     "rx": "^4.0.8",
     "xml2js": "^0.4.16"
