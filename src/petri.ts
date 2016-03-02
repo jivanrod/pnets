@@ -2,6 +2,8 @@ import _ = require('lodash');
 import events = require('events');
 import Rx = require('rx');
 import xml2js = require('xml2js');
+import {Promise} from 'es6-promise';
+
 /**
 * Petri nets module
 * @preferred
@@ -86,11 +88,16 @@ module petri {
 			}));
 		}
 
-		consume() {
-			/*if (this.tokens < 1) {
-				return;
-			}*/
-			return;
+		/**
+		* Consumes m tokens from a place
+		* @param m Number of tokens to be consumed
+		* @return Array of tokens that were removed from the place
+		*/
+		consume(m: number): Token[] {
+			if (m > this.tokens.length){
+				throw new Error("Trying to consume more tokens that place has");
+			}
+			return this.tokens.splice(0,m);
 
 			//this.tokens -= 1;
 		}
@@ -122,7 +129,8 @@ module petri {
 		enabled: boolean;
 	}
 
-	export abstract class Transition extends Node {
+	export class Transition extends Node {
+		protected executeFn: any = null;
 		constructor(public name: string) {
 			super(name);
 
@@ -133,8 +141,11 @@ module petri {
 					arc.inputNode.obs.subscribe(
 						(x: boolean) => {
 							// Iterating across input nodes to check firing
-							if (this.enabled()){
-								this.fire();
+							var tokens = this.enabled();
+							if (tokens !== null){
+								this.execute(tokens).then( () => {
+									console.log("Task "+this.name+" completed");
+								});
 							}
 						},
 						(err) => {
@@ -149,34 +160,42 @@ module petri {
 		}
 
 		/**
-		* Checks whether preconditions are filled for firing
-		* @return boolean
+		* Allows to implement customized asynchronous task execution behavior
+		* @param fn Function returning an es6 promise resolving on task completion
 		*/
-		enabled(): boolean {
+		implement(fn: any): void {
+			this.executeFn = fn;
+		}
 
-			var enable = true;
+		/**
+		* Checks whether preconditions are filled for firing
+		* @return Null if not ready to fire, array of tokens if firing.
+		*/
+		enabled(): Token[] {
+			var enable = null;
 			_.forEach(this.inputArcs, (arc: Arc) => {
 				var node = <Place>arc.inputNode;
-				enable = enable && (node.tokens.length == arc.m);
+				if (node.tokens.length > arc.m){
+					enable = enable || [];
+					enable = _.concat(enable, node.consume(arc.m));
+				}
 			});
 			return enable;
 		}
 
-		fire() {
-			if (!this.enabled()) {
-				return;
-			}
-
-			_.each(this.inputs(), (p: Place) => p.consume());
-			_.each(this.outputs(), (p: Place) => p.produce());
-			this.emit('fire');
-		}
-
 		/**
-		* Abstract method for non-instantaneous task execution
-		* @return Returns RxJS observable resolving the task executiong
+		* Execution promise factory function for internal use only
+		* @param tokens Array of tokens involved in the transition execution
+		* @return Returns ES6 promise resolving on transition completion
 		*/
-		abstract execute(): Rx.Observable<any>;
+		execute(tokens: Token[]): Promise<string> {
+			if (this.executeFn === null){
+				return Promise.resolve('ok');
+			}
+			else{
+				return this.executeFn(tokens)
+			}
+		}
 
 		describe(): TransitionDescription {
 			return <TransitionDescription> _.extend(super.describe(), {
@@ -184,6 +203,27 @@ module petri {
 				places: _.map(this.outputs(), 'name')
 			});
 		}
+	}
+
+	/**
+	* Class represented a transition with a fixed time duration.
+	*/
+	export class TimedTransition extends Transition {
+		private duration: number = 1;
+		/**
+		* TimedTransition constructor
+		* @param duration Transition duration in seconds
+		*/
+		constructor(name: string, duration: number) {
+			super(name);
+			this.duration = duration;
+			this.executeFn = (tokens: Token[]) => {
+				return new Promise<string>( (resolve,reject) => {
+					setTimeout( () => { resolve('ok'); }, duration);
+				});
+			};
+		}
+
 	}
 
 	export class Net {
@@ -199,10 +239,6 @@ module petri {
 
 		ingest(count: number = 1) {
 			//this.start.tokens += count;
-		}
-
-		execute() {
-			_.each(this.transitions, (t: Transition) => t.fire());
 		}
 
 		summary(): String[] {
@@ -231,7 +267,17 @@ module petri {
 		static fromPnml(xmlString: string): Net {
 			var net = new Net();
 			xml2js.parseString(xmlString, (err, results) => {
-				
+				console.log(JSON.stringify(results,null,2));
+				// Importing places
+				var places = results['pnml']['net'][0]['place'];
+				_.forEach(places, (pl) => {
+					net.places.push(new Place(pl['$']['id']));
+				});
+				// Importing transitions
+				var transitions = results['pnml']['net'][0]['transition'];
+				_.forEach(transitions, (t) => {
+					net.transitions.push(new TimedTransition(t['$']['id'],1));
+				});
 			});
 			return net;
 		}
