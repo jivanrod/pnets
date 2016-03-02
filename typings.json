@@ -7,8 +7,5 @@
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts",
     "rx": "file:./node_modules/rx/ts/rx.d.ts",
     "xml2js": "github:DefinitelyTyped/DefinitelyTyped/xml2js/xml2js.d.ts#7304e0770d53762f89af7fcf14517d5f45a04cc2"
-  },
-  "dependencies": {
-    "pnets": "file:./src/petri.d.ts"
   }
 }
