@@ -11,9 +11,18 @@ describe('PNML Import', () => {
   })
 
   it ('should load the XML in a Javascript object', () => {
-    console.log(net);
     if (!net){
       throw new Error('XML import failed');
     }
+  });
+
+  it ('should initialize the net', () => {
+    net.init();
+  })
+
+  it ('should insert a token in start place', function(done) {
+    this.timeout(0);
+    net.ingest('start');
+    setTimeout(function(){console.log('test'); done();  },10000);
   })
 });

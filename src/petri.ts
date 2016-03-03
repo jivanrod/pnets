@@ -23,7 +23,7 @@ module petri {
 	}
 
 	export class Token {
-		constructor(type: string){
+		constructor(type: string = 'default'){
 			this.type = type;
 		}
 
@@ -38,6 +38,7 @@ module petri {
 		public inputArcs: Arc[] = [];
 		public outputArcs: Arc[] = [];
 		public obs: Rx.Observable<any> = null;
+		public subject: Rx.Subject<any> = null;
 
 		constructor(public name: string) {
 			super();
@@ -68,24 +69,32 @@ module petri {
 
 		constructor(public name: string) {
 			super(name);
-			this.obs = Rx.Observable.defer( () => Rx.Observable.create( (observer) => {
-				// Iterating over input arc
-				_.forEach(this.inputArcs, (arc: Arc) => {
-					// Subscribe to nodes
-					arc.inputNode.obs.subscribe(
-						(x: Token[]) => {
-							this.tokens = _.concat(this.tokens,x);
-							observer.onNext(true);
-						},
-						(err) => {
-							console.error(err);
-						},
-						() => {
-							console.log("Done");
-						}
-					)
-				})
-			}));
+			// Creating a deferred observable, created on first subscribe
+			this.subject = new Rx.Subject();
+		}
+
+		addToken(token: Token) {
+			this.tokens.push(token);
+			this.subject.onNext(true);
+		}
+
+		init() {
+			_.forEach(this.inputArcs, (arc: Arc) => {
+				// Subscribe to input nodes
+				arc.inputNode.subject.subscribe(
+					(x: Token[]) => {
+						this.tokens = _.concat(this.tokens,x);
+						this.subject.onNext(true);
+						console.log("Token received by place "+this.name);
+					},
+					(err) => {
+						console.error(err);
+					},
+					() => {
+						console.log("Done");
+					}
+				)
+			});
 		}
 
 		/**
@@ -133,30 +142,31 @@ module petri {
 		protected executeFn: any = null;
 		constructor(public name: string) {
 			super(name);
+			this.subject = new Rx.Subject();
+		}
 
-			this.obs = Rx.Observable.defer( () => Rx.Observable.create( (observer) => {
-				// Iterating over input arc
-				_.forEach(this.inputArcs, (arc: Arc) => {
-					// Subscribe to nodes
-					arc.inputNode.obs.subscribe(
-						(x: boolean) => {
-							// Iterating across input nodes to check firing
-							var tokens = this.enabled();
-							if (tokens !== null){
-								this.execute(tokens).then( () => {
-									console.log("Task "+this.name+" completed");
-								});
-							}
-						},
-						(err) => {
-							console.error(err);
-						},
-						() => {
-							console.log("Done");
+		init() {
+			_.forEach(this.inputArcs, (arc: Arc) => {
+				// Subscribe to nodes
+				arc.inputNode.subject.subscribe(
+					(x: boolean) => {
+						// Iterating across input nodes to check firing
+						console.log("Token update received by transition "+this.name);
+						var tokens = this.enabled();
+						if (tokens !== null){
+							this.execute(tokens).then( () => {
+								console.log("Task "+this.name+" completed");
+							});
 						}
-					)
-				})
-			}));
+					},
+					(err) => {
+						console.error(err);
+					},
+					() => {
+						console.log("Done");
+					}
+				)
+			})
 		}
 
 		/**
@@ -234,6 +244,24 @@ module petri {
 		constructor() {
 		}
 
+		init(){
+			_.forEach(this.transitions, (t) => { t.init() });
+			_.forEach(this.places, (p) => { p.init(); });
+			/*var endNode =_.find(this.places, (p) => { return p.name == 'end'});
+			console.log(endNode);
+			endNode.obs.subscribe(
+				(x) => {
+					console.log("Ended "+x);
+				},
+				(err) => {
+					console.error(err);
+				},
+				() => {
+					console.log("Done");
+				}
+			);*/
+		}
+
 		/**
 		* Finds and returns node in existing net
 		* @param nodeId ID of the node
@@ -267,7 +295,7 @@ module petri {
 		* @param m Multiplicity of the arc
 		*/
 		addArc(sourceId: string, targetId: string, m: number) {
-			console.log("Adding arc between "+sourceId+" and "+targetId);
+			//console.log("Adding arc between "+sourceId+" and "+targetId);
 			var source = this.findNode(sourceId);
 			var target = this.findNode(targetId);
 			if (source === undefined) { throw new Error("Source node not found")};
@@ -278,8 +306,12 @@ module petri {
 			this.arcs.push(new Arc(source.node, target.node, m));
 		}
 
-		ingest(count: number = 1) {
-			//this.start.tokens += count;
+		ingest(nodeId: string, count: number = 1) {
+			var node = this.findNode(nodeId);
+			if (node === undefined) { throw new Error("Node "+nodeId+" doesn't exist")}
+			if (node.type != 'place'){ throw new Error("Transition node can't ingest")}
+			var place = <Place>node.node;
+			_.times(count, () => { place.addToken(new Token()) });
 		}
 
 		summary(): String[] {
@@ -308,7 +340,7 @@ module petri {
 		static fromPnml(xmlString: string): Net {
 			var net = new Net();
 			xml2js.parseString(xmlString, (err, results) => {
-				console.log(JSON.stringify(results,null,2));
+				//console.log(JSON.stringify(results,null,2));
 				// Importing places
 				var places = results['pnml']['net'][0]['place'];
 				_.forEach(places, (pl) => {
@@ -320,7 +352,6 @@ module petri {
 					net.transitions.push(new TimedTransition(t['$']['id'],1));
 				});
 				// Importing arcs
-				console.log(net.places);
 				var arcs = results['pnml']['net'][0]['arc'];
 				_.forEach(arcs, (arc) => {
 					net.addArc(arc['$']['source'],arc['$']['target'],1);
