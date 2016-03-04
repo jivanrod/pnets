@@ -9,6 +9,9 @@ import {Promise} from 'es6-promise';
 * @preferred
 */
 module petri {
+	/**
+	* Class for petri net arcs
+	*/
 	export class Arc {
 		public inputNode: Node = null;
 		public outputNode: Node = null;
@@ -23,6 +26,9 @@ module petri {
 		}
 	}
 
+	/**
+	* Class for petri tokens
+	*/
 	export class Token {
 		constructor(type: string = 'default'){
 			this.type = type;
@@ -31,10 +37,9 @@ module petri {
 		public type: string = 'default'
 	}
 
-	export interface NodeDescription {
-		name: String
-	}
-
+	/**
+	* Base class for petri nodes
+	*/
 	export class Node extends events.EventEmitter {
 		public inputArcs: Arc[] = [];
 		public outputArcs: Arc[] = [];
@@ -43,27 +48,11 @@ module petri {
 		constructor(public name: string) {
 			super();
 		}
-
-		inputs() {
-			return _.map(this.inputArcs, 'input');
-		}
-
-		outputs() {
-			return _.map(this.outputArcs, 'output');
-		}
-
-		describe(): NodeDescription {
-			return {
-				name: this.name
-			};
-		}
 	}
 
-	export interface PlaceDescription extends NodeDescription {
-		transitions: String[];
-		tokens: number;
-	}
-
+	/**
+	* Class for petri places
+	*/
 	export class Place extends Node {
 		public tokens: Token[] = [];
 		constructor(public name: string) {
@@ -72,6 +61,10 @@ module petri {
 			this.subject = new Rx.Subject();
 		}
 
+		/**
+		* Add tokens to place and notifies downstream transitions
+		* @param tokens Array of tokens to be added
+		*/
 		addTokens(tokens: Token[]) {
 			console.log("Added tokens to place: "+this.name);
 			this.tokens = this.tokens.concat(tokens);
@@ -92,21 +85,8 @@ module petri {
 				throw new Error("Trying to consume more tokens that place has");
 			}
 			return this.tokens.splice(0,m);
-
-			//this.tokens -= 1;
 		}
 
-		produce() {
-			//this.tokens += 1;
-		}
-
-		describe(): PlaceDescription {
-			return <PlaceDescription> _.extend(super.describe(), {
-				type: 'place',
-				tokens: this.tokens,
-				transitions: _.map(this.outputs(), 'name')
-			});
-		}
 	}
 
 	/**
@@ -118,11 +98,9 @@ module petri {
 		}
 	}
 
-	export interface TransitionDescription extends NodeDescription {
-		places: String[];
-		enabled: boolean;
-	}
-
+	/**
+	* Class for petri net transitions
+	*/
 	export class Transition extends Node {
 		protected executeFn: any = null;
 		constructor(public name: string) {
@@ -173,15 +151,16 @@ module petri {
 		* @return Null if not ready to fire, array of tokens if firing.
 		*/
 		enabled(): Token[] {
-			var enable = null;
-			_.forEach(this.inputArcs, (arc: Arc) => {
+			// Check that all arcs multiplicities are satisfied
+			var enabled = _.reduce(this.inputArcs, (enable,arc) => {
+				return enable && ( (<Place>arc.inputNode).tokens.length >= arc.m)
+			}, true);
+			// If yes, consume and return tokens, else return null
+			if (!enabled) { return null;}
+			return _.reduce(this.inputArcs, (tokens,arc) => {
 				var node = <Place>arc.inputNode;
-				if (node.tokens.length >= arc.m){
-					enable = (enable == null) ? [] : enable;
-					enable = enable.concat(node.consume(arc.m));
-				}
-			});
-			return enable;
+				return tokens.concat(node.consume(arc.m))
+			}, []);
 		}
 
 		/**
@@ -198,12 +177,6 @@ module petri {
 			}
 		}
 
-		describe(): TransitionDescription {
-			return <TransitionDescription> _.extend(super.describe(), {
-				type: 'transition',
-				places: _.map(this.outputs(), 'name')
-			});
-		}
 	}
 
 	/**
@@ -235,22 +208,23 @@ module petri {
 		constructor() {
 		}
 
+		/**
+		* Initializes the net for continuous time execution
+		*/
 		init(){
 			_.forEach(this.transitions, (t) => { t.init() });
 			_.forEach(this.places, (p) => { p.init(); });
-			/*var endNode =_.find(this.places, (p) => { return p.name == 'end'});
-			console.log(endNode);
-			endNode.obs.subscribe(
-				(x) => {
-					console.log("Ended "+x);
-				},
-				(err) => {
-					console.error(err);
-				},
-				() => {
-					console.log("Done");
-				}
-			);*/
+		}
+
+		/**
+		* Sets end place
+		*/
+		makeEnd(endPlace: string) {
+			var result = this.findNode(endPlace);
+			if (result === undefined) { throw new Error(endPlace+" does not exist"); }
+			if (result.type != 'place') { throw new Error("Only places can be used as net end");}
+			var place = <Place>result.node;
+			return place.subject.toPromise();
 		}
 
 		/**
@@ -297,6 +271,11 @@ module petri {
 			this.arcs.push(new Arc(source.node, target.node, m));
 		}
 
+		/**
+		* Inserts tokens in a given place of the petri net
+		* @param nodeId String ID of the node to be added tokens
+		* @param count Number of tokens to be added (default:1)
+		*/
 		ingest(nodeId: string, count: number = 1) {
 			var node = this.findNode(nodeId);
 			if (node === undefined) { throw new Error("Node "+nodeId+" doesn't exist")}
@@ -306,28 +285,11 @@ module petri {
 			place.addTokens(tokens);
 		}
 
-		summary(): String[] {
-			var summarize = (place) : String => {
-				return [place.name, place.tokens].join(': ');
-			};
-
-			return _.map(this.places, summarize);
-		}
-
-		describe(): Object[] {
-			var places = _.map(this.places, (place) => {
-				return place.describe();
-			});
-
-			var transitions = _.map(this.transitions, (transition) => {
-				return transition.describe();
-			});
-
-			return [].concat(places, transitions);
-		}
 
 		/**
 		* Static function to create Net from Pnml
+		* @param Xml string
+		* @return Petri net
 		*/
 		static fromPnml(xmlString: string): Net {
 			var net = new Net();
@@ -351,35 +313,6 @@ module petri {
 			});
 			return net;
 		}
-	}
-
-	export interface VisitResult {
-		places: Place[];
-		transitions: Transition[]
-	}
-
-	export function visit(start: Place, result: VisitResult = { places: [], transitions: [] }) : VisitResult {
-		if (_.includes(result.places, start)) {
-			return result;
-		}
-
-		result.places.push(start);
-
-		var transitions = <Transition[]> start.outputs();
-
-		if (transitions.length === 0) {
-			return result;
-		}
-
-		result.transitions = result.transitions.concat(transitions);
-
-		_.each(transitions, (transition) => {
-			_.each(transition.outputs(), (place: Place) => {
-				visit(place, result);
-			});
-		});
-
-		return result;
 	}
 
 }
