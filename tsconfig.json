@@ -25,6 +25,7 @@
         "!typings/main/**"
     ],
     "files": [
+        "src/petri.d.ts",
         "src/petri.ts",
         "test/ImportTest.d.ts",
         "test/ImportTest.ts",

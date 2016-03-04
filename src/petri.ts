@@ -13,6 +13,7 @@ module petri {
 		public inputNode: Node = null;
 		public outputNode: Node = null;
 		public m: number = 1;
+		public sub: Rx.Disposable = null;
 		constructor(input: Node, output: Node, m: number) {
 			this.inputNode = input;
 			this.outputNode = output;
@@ -37,9 +38,8 @@ module petri {
 	export class Node extends events.EventEmitter {
 		public inputArcs: Arc[] = [];
 		public outputArcs: Arc[] = [];
-		public obs: Rx.Observable<any> = null;
 		public subject: Rx.Subject<any> = null;
-
+		public sub: Rx.Disposable = null;
 		constructor(public name: string) {
 			super();
 		}
@@ -66,35 +66,20 @@ module petri {
 
 	export class Place extends Node {
 		public tokens: Token[] = [];
-
 		constructor(public name: string) {
 			super(name);
 			// Creating a deferred observable, created on first subscribe
 			this.subject = new Rx.Subject();
 		}
 
-		addToken(token: Token) {
-			this.tokens.push(token);
+		addTokens(tokens: Token[]) {
+			console.log("Added tokens to place: "+this.name);
+			this.tokens = this.tokens.concat(tokens);
 			this.subject.onNext(true);
 		}
 
 		init() {
-			_.forEach(this.inputArcs, (arc: Arc) => {
-				// Subscribe to input nodes
-				arc.inputNode.subject.subscribe(
-					(x: Token[]) => {
-						this.tokens = _.concat(this.tokens,x);
-						this.subject.onNext(true);
-						console.log("Token received by place "+this.name);
-					},
-					(err) => {
-						console.error(err);
-					},
-					() => {
-						console.log("Done");
-					}
-				)
-			});
+			console.log("Initializing place: "+this.name);
 		}
 
 		/**
@@ -146,27 +131,33 @@ module petri {
 		}
 
 		init() {
+			console.log("Initializing transition: "+this.name);
 			_.forEach(this.inputArcs, (arc: Arc) => {
 				// Subscribe to nodes
-				arc.inputNode.subject.subscribe(
-					(x: boolean) => {
-						// Iterating across input nodes to check firing
-						console.log("Token update received by transition "+this.name);
-						var tokens = this.enabled();
-						if (tokens !== null){
-							this.execute(tokens).then( () => {
-								console.log("Task "+this.name+" completed");
-							});
-						}
-					},
-					(err) => {
-						console.error(err);
-					},
-					() => {
-						console.log("Done");
-					}
-				)
+				console.log(this.name+" subscribing to "+arc.inputNode.name);
+				arc.sub = arc.inputNode.subject.subscribe(this.subject);
 			})
+			this.sub = this.subject.subscribe(
+				(x: boolean) => {
+					// Iterating across input nodes to check firing
+					var tokens = this.enabled();
+					if (tokens !== null){
+						this.execute(tokens).then( () => {
+							console.log("Task "+this.name+" completed");
+							_.forEach(this.outputArcs, (arc: Arc) => {
+								var tokens = _.times(arc.m, () => { return new Token() });
+								(<Place>arc.outputNode).addTokens(tokens);
+							})
+						});
+					}
+				},
+				(err) => {
+					console.error(err);
+				},
+				() => {
+					console.log("Done");
+				}
+			)
 		}
 
 		/**
@@ -185,9 +176,9 @@ module petri {
 			var enable = null;
 			_.forEach(this.inputArcs, (arc: Arc) => {
 				var node = <Place>arc.inputNode;
-				if (node.tokens.length > arc.m){
-					enable = enable || [];
-					enable = _.concat(enable, node.consume(arc.m));
+				if (node.tokens.length >= arc.m){
+					enable = (enable == null) ? [] : enable;
+					enable = enable.concat(node.consume(arc.m));
 				}
 			});
 			return enable;
@@ -229,7 +220,7 @@ module petri {
 			this.duration = duration;
 			this.executeFn = (tokens: Token[]) => {
 				return new Promise<string>( (resolve,reject) => {
-					setTimeout( () => { resolve('ok'); }, duration);
+					setTimeout( () => { resolve('ok'); }, duration*1000);
 				});
 			};
 		}
@@ -311,7 +302,8 @@ module petri {
 			if (node === undefined) { throw new Error("Node "+nodeId+" doesn't exist")}
 			if (node.type != 'place'){ throw new Error("Transition node can't ingest")}
 			var place = <Place>node.node;
-			_.times(count, () => { place.addToken(new Token()) });
+			var tokens = _.times(count, () => { return new Token() });
+			place.addTokens(tokens);
 		}
 
 		summary(): String[] {
