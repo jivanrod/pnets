@@ -1,15 +1,17 @@
 # Pnets v 0.1
-A library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net). Initially inspired from  inspired and forked from [warrenseymour/petri-net](warrenseymour/petri-net), it has little to do with the initial
-library. TypeScript has be kept as the development language for scalability purposes.
+A library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net).
+Initially inspired from  inspired from [warrenseymour/petri-net](warrenseymour/petri-net),
+it has little to do with the initial library. TypeScript has be picked as the
+development language for scalability purposes.
 
 ## Features
 - Representation of petri nets
 - Places, Transitions, Tokens, Arcs with multiplicity
-- Use of RXJS observable pattern for asynchronous events handling
+- Use of RXJS observable pattern and promises for asynchronous events handling
+- Import from PNML format
+- Weighted Arcs
 
 ## Roadmap
-- Weighted Arcs
-- Import from PNML format
 - Extensions such as Coloured, Timed and Hierarchical Nets
 
 ## Usage
@@ -26,4 +28,10 @@ typings install
 ### Run test suite
 ```bash
 npm test
+```
+
+### Generate the documentation (Requires typedoc)
+```
+npm install -g typedoc
+typedoc --out doc/ --module commonjs --target ES5 --ignoreCompilerErrors src/
 ```
