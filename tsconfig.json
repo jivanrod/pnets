@@ -25,10 +25,14 @@
         "!typings/main/**"
     ],
     "files": [
+        "src/extensions/places/place-ros.d.ts",
+        "src/extensions/places/place-ros.ts",
         "src/petri.d.ts",
         "src/petri.ts",
         "test/ImportTest.d.ts",
         "test/ImportTest.ts",
+        "test/RosTest.d.ts",
+        "test/RosTest.ts",
         "typings/main.d.ts"
     ],
     "atom": {

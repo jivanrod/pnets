@@ -27,6 +27,9 @@
     "rx": "^4.0.8",
     "xml2js": "^0.4.16"
   },
+  "optionalDependencies": {
+    "roslib": "~0.18.0"
+  },
   "devDependencies": {
     "event-stream": "~3.2.1",
     "gulp": "~3.8.10",

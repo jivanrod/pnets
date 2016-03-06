@@ -5,6 +5,7 @@
     "lodash": "github:DefinitelyTyped/DefinitelyTyped/lodash/lodash.d.ts#7b7aa2027a8fb6219a8bcf1b6bb12bcd0ff9539d",
     "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#d6dd320291705694ba8e1a79497a908e9f5e6617",
     "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts",
+    "roslib": "github:DefinitelyTyped/DefinitelyTyped/roslib/roslib.d.ts#05aa3a75a46d711ecdfab86b28097e742b3c6bb9",
     "rx": "file:./node_modules/rx/ts/rx.d.ts",
     "xml2js": "github:DefinitelyTyped/DefinitelyTyped/xml2js/xml2js.d.ts#7304e0770d53762f89af7fcf14517d5f45a04cc2"
   }
