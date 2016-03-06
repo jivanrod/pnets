@@ -55,10 +55,25 @@ module petri {
 	*/
 	export class Place extends Node {
 		public tokens: Token[] = [];
+		public isEnd: boolean = false;
+
 		constructor(public name: string) {
 			super(name);
 			// Creating a deferred observable, created on first subscribe
 			this.subject = new Rx.Subject();
+		}
+
+		/**
+		* Set tokens property to given tokens array
+		* @param tokens Array of tokens that will replace current tokens
+		*/
+		protected setTokens(tokens: Token[]){
+			console.log("Setting tokens at place: "+this.name);
+			this.tokens = [].concat(tokens);
+			this.subject.onNext(true);
+			if (this.isEnd){
+				this.subject.onCompleted();
+			}
 		}
 
 		/**
@@ -69,6 +84,9 @@ module petri {
 			console.log("Added tokens to place: "+this.name);
 			this.tokens = this.tokens.concat(tokens);
 			this.subject.onNext(true);
+			if (this.isEnd){
+				this.subject.onCompleted();
+			}
 		}
 
 		init() {
@@ -102,10 +120,12 @@ module petri {
 	* Class for petri net transitions
 	*/
 	export class Transition extends Node {
-		protected executeFn: any = null;
+		protected executeFn: (tokens: Token[]) => Promise<string>
 		constructor(public name: string) {
 			super(name);
 			this.subject = new Rx.Subject();
+			// Default instantaneous transition execution
+			this.executeFn = () => { return Promise.resolve('ok');}
 		}
 
 		init() {
@@ -170,11 +190,9 @@ module petri {
 		*/
 		execute(tokens: Token[]): Promise<string> {
 			if (this.executeFn === null){
-				return Promise.resolve('ok');
+				throw new Error("Non validation transition execution promise")
 			}
-			else{
-				return this.executeFn(tokens)
-			}
+			return this.executeFn(tokens)
 		}
 
 	}
@@ -224,6 +242,7 @@ module petri {
 			if (result === undefined) { throw new Error(endPlace+" does not exist"); }
 			if (result.type != 'place') { throw new Error("Only places can be used as net end");}
 			var place = <Place>result.node;
+			place.isEnd = true;
 			return place.subject.toPromise();
 		}
 
