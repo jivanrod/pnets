@@ -13,7 +13,7 @@
   "main": "src/petri.js",
   "scripts": {
     "pretest": "tsc",
-    "test": "mocha"
+    "test": "mocha test/PaperTest.js"
   },
   "author": {
     "name": "Sebastien Mamessier",
@@ -32,13 +32,7 @@
   },
   "devDependencies": {
     "event-stream": "~3.2.1",
-    "gulp": "~3.8.10",
-    "gulp-concat": "~2.4.2",
-    "gulp-coverage": "~0.3.32",
-    "gulp-jasmine": "~1.0.1",
-    "gulp-plumber": "~0.6.6",
-    "gulp-typescript": "~2.3.0",
-    "jasmine": "~2.1.1",
+    "typescript": "~1.8.7",
     "mocha": "^2.4.5",
     "source-map-support": "~0.2.8"
   }

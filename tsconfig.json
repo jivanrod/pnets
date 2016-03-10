@@ -16,25 +16,12 @@
     },
     "compileOnSave": true,
     "buildOnSave": true,
-    "filesGlob": [
-        "**/*.ts",
-        "**/*.tsx",
-        "!node_modules/**",
-        "!typings/browser/**",
-        "!typings/browser.d.ts",
-        "!typings/main/**"
-    ],
     "files": [
-        "src/extensions/places/place-ros.d.ts",
         "src/extensions/places/place-ros.ts",
-        "src/extensions/transitions/transition-ros.d.ts",
         "src/extensions/transitions/transition-ros.ts",
-        "src/petri.d.ts",
         "src/petri.ts",
-        "test/ImportTest.d.ts",
         "test/ImportTest.ts",
         "test/PaperTest.ts",
-        "test/RosTest.d.ts",
         "test/RosTest.ts",
         "typings/main.d.ts"
     ],
