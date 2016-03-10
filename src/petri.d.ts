@@ -2,11 +2,14 @@ import events = require('events');
 import Rx = require('rx');
 declare module petri {
     class Arc {
+        type: string;
         inputNode: Node;
         outputNode: Node;
         m: number;
         sub: Rx.Disposable;
-        constructor(input: Node, output: Node, m: number);
+        observable: Rx.Observable<string>;
+        observer: Rx.Observer<any>;
+        constructor(input: Node, output: Node, m: number, type?: string);
     }
     class Token {
         constructor(type?: string);
@@ -36,11 +39,13 @@ declare module petri {
     }
     class Transition extends Node {
         name: string;
+        protected execType: string;
         protected executeFn: (tokens: Token[]) => Promise<string>;
         constructor(name: string);
-        init(): void;
+        init(execType: string): void;
         implement(fn: (tokens: Token[]) => Promise<string>): void;
-        enabled(): Token[];
+        enabled(type?: string): boolean;
+        consume(type?: string): Token[];
         execute(tokens: Token[]): Promise<string>;
     }
     class TimedTransition extends Transition {
@@ -52,7 +57,7 @@ declare module petri {
         places: Place[];
         arcs: Arc[];
         constructor();
-        init(): void;
+        init(execType?: string): void;
         makeEnd(endPlace: string): Rx.IPromise<any>;
         findNode(nodeId: string): {
             node: Node;

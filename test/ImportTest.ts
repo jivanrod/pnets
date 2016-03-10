@@ -22,7 +22,7 @@ describe('PNML Import', () => {
 
   it ('should insert a token in start place and run it', function(done) {
     this.timeout(10000);
-    net.init();
+    net.init();//'default'
     net.ingest('start',3);
     net.makeEnd('end').then( () => {
       done();

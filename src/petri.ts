@@ -17,12 +17,21 @@ module petri {
 		public outputNode: Node = null;
 		public m: number = 1;
 		public sub: Rx.Disposable = null;
-		constructor(input: Node, output: Node, m: number) {
+		public observable: Rx.Observable<string> = null;
+		public observer: Rx.Observer<any> = null;
+		constructor(input: Node, output: Node, m: number, public type: string = 'default') {
 			this.inputNode = input;
 			this.outputNode = output;
 			this.m = m;
 			this.inputNode.outputArcs.push(this);
 			this.outputNode.inputArcs.push(this);
+			this.observable = Rx.Observable.create<string>( (obs) => {
+				this.sub = this.inputNode.subject.subscribe(
+					(x) => { obs.onNext(this.type); },
+					(err) => { throw new Error(err);},
+					() => { console.log("Arc of type "+this.type+" completed");}
+				)
+			});
 		}
 	}
 
@@ -119,6 +128,7 @@ module petri {
 	* Class for petri net transitions
 	*/
 	export class Transition extends Node {
+		protected execType: string = 'default';
 		protected executeFn: (tokens: Token[]) => Promise<string>
 		constructor(public name: string) {
 			super(name);
@@ -127,26 +137,34 @@ module petri {
 			this.executeFn = () => { return Promise.resolve('ok');}
 		}
 
-		init() {
+		init(execType: string) {
+			this.execType = execType;
 			console.log("Initializing transition: "+this.name);
 			_.forEach(this.inputArcs, (arc: Arc) => {
 				// Subscribe to nodes
 				console.log(this.name+" subscribing to "+arc.inputNode.name);
-				arc.sub = arc.inputNode.subject.subscribe(this.subject);
+				arc.sub = arc.observable.subscribe(this.subject);
 			})
 			this.sub = this.subject.subscribe(
-				(x: boolean) => {
+				(type: string) => {
+					console.log("Checking transition "+this.name+" in mode "+type);
 					// Iterating across input nodes to check firing
-					var tokens = this.enabled();
-					if (tokens !== null){
-						this.execute(tokens).then( () => {
-							console.log("Task "+this.name+" completed");
-							_.forEach(this.outputArcs, (arc: Arc) => {
-								var tokens = _.times(arc.m, () => { return new Token() });
-								(<Place>arc.outputNode).addTokens(tokens);
-							})
-						});
+					var enabled = this.enabled(type);
+					// If conditions not satisfied, do nothing
+					if (!enabled) { return; }
+					// If transition enabled but Net in other execution mode, log
+					if (type != this.execType){
+						return console.log(this.name + " would have fired in "+type+" mode.");
 					}
+					// If transition enabled in Net execution mode, consume and fire.
+					var tokens = this.consume(type);
+					this.execute(tokens).then( () => {
+						console.log("Task "+this.name+" completed");
+						_.forEach(this.outputArcs, (arc: Arc) => {
+							var tokens = _.times(arc.m, () => { return new Token() });
+							(<Place>arc.outputNode).addTokens(tokens);
+						})
+					});
 				},
 				(err) => {
 					console.error(err);
@@ -169,18 +187,23 @@ module petri {
 		* Checks whether preconditions are filled for firing
 		* @return Null if not ready to fire, array of tokens if firing.
 		*/
-		enabled(): Token[] {
+		enabled(type: string = 'default') {
 			// Check that all arcs multiplicities are satisfied
 			var enabled = _.reduce(this.inputArcs, (enable,arc) => {
-				return enable && ( (<Place>arc.inputNode).tokens.length >= arc.m)
+				return enable && (arc.type == type) && ( (<Place>arc.inputNode).tokens.length >= arc.m)
 			}, true);
-			// If yes, consume and return tokens, else return null
-			if (!enabled) { return null;}
+			return enabled;
+		}
+
+		consume(type: string = 'default'): Token[] {
 			return _.reduce(this.inputArcs, (tokens,arc) => {
 				var node = <Place>arc.inputNode;
-				return tokens.concat(node.consume(arc.m))
+				return (arc.type == type) ? tokens.concat(node.consume(arc.m)) : tokens;
 			}, []);
 		}
+		/**
+		*
+		*/
 
 		/**
 		* Execution promise factory function for internal use only
@@ -228,8 +251,8 @@ module petri {
 		/**
 		* Initializes the net for continuous time execution
 		*/
-		init(){
-			_.forEach(this.transitions, (t) => { t.init() });
+		init(execType: string = 'default'){
+			_.forEach(this.transitions, (t) => { t.init(execType) });
 			_.forEach(this.places, (p) => { p.init(); });
 		}
 
