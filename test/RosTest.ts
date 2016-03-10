@@ -8,6 +8,8 @@ describe('Ros Places', () => {
 
   before(function() {
     net = Net.fromPnml(xmlString);
+    // Ros stuff
+    
     net.init();
   })
 

@@ -68,7 +68,6 @@ module petri {
 		* @param tokens Array of tokens that will replace current tokens
 		*/
 		protected setTokens(tokens: Token[]){
-			console.log("Setting tokens at place: "+this.name);
 			this.tokens = [].concat(tokens);
 			this.subject.onNext(true);
 			if (this.isEnd){
@@ -162,7 +161,7 @@ module petri {
 		* Allows to implement customized asynchronous task execution behavior
 		* @param fn Function returning an es6 promise resolving on task completion
 		*/
-		implement(fn: any): void {
+		implement(fn: (tokens: Token[]) => Promise<string>): void {
 			this.executeFn = fn;
 		}
 
@@ -310,14 +309,31 @@ module petri {
 		* @param Xml string
 		* @return Petri net
 		*/
-		static fromPnml(xmlString: string): Net {
+		static fromPnml(xmlString: string, extensions: any = null): Net {
+			var placeClass = (id) => {
+				var pClass = Place;
+				// Checking if extensions were passed
+				if (extensions == null) { return pClass;}
+				// Checking if node identifier contains extension
+				var spl = id.split('.');
+				if (spl.length < 2) { return pClass;}
+				// Checking if identifier extension passed in extensions
+				_.forEach(extensions, (classes,ext) => {
+					if (classes.place && ext == spl[0]){
+						pClass = classes.place
+					}
+				})
+				return pClass;
+			}
 			var net = new Net();
 			xml2js.parseString(xmlString, (err, results) => {
 				//console.log(JSON.stringify(results,null,2));
 				// Importing places
 				var places = results['pnml']['net'][0]['place'];
 				_.forEach(places, (pl) => {
-					net.places.push(new Place(pl['$']['id']));
+					var pId = pl['$']['id'];
+					var pClass = placeClass(pId)
+					net.places.push(new pClass(pId));
 				});
 				// Importing transitions
 				var transitions = results['pnml']['net'][0]['transition'];

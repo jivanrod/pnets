@@ -15,10 +15,10 @@ export interface RosInt32 {
 /**
 * Place getting tokens from a ROS topic
 */
-export class RosPlace<T> extends Place{
+export class RosPlace extends Place{
 
   private topicHandle: any;
-
+  private tokenFn: (Message) => Token[];
   /**
   * RosPlace constructor
   * @param name Name of the petri place
@@ -26,11 +26,13 @@ export class RosPlace<T> extends Place{
   * @param throttle Period at which topic message is sent through Roslibjs
   * @param tokenFn Callback mapping a Ros msg to a token array
   */
-	constructor(name: string, topic: string, type: string,
-              private tokenFn: (Message) => Token[], throttle: number, rosHandle: Ros){
+	constructor(name: string){
     // Calling super class Place constructor
     super(name);
-    // Creating topic
+	}
+
+  initRos(topic: string, type: string,
+              tokenFn: (Message) => Token[], throttle: number, rosHandle: Ros){
     this.topicHandle = new Topic({
       ros: rosHandle,
       name: topic,
@@ -41,7 +43,9 @@ export class RosPlace<T> extends Place{
     this.topicHandle.subscribe( (msg) => {
       this.setTokens(tokenFn(msg));
     })
-	}
-
-
+  }
+  // Helpers
+  static LT(value: number){
+    return (msg) => { return (msg.data < value) ? [new Token()] : [] ; };
+  }
 }
