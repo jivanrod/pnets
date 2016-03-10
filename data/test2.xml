@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><pnml>
+<net id="Net-One" type="P/T net">
+<token id="Default" enabled="true" red="0" green="0" blue="0"/>
+<place id="end">
+<graphics>
+<position x="555.0" y="255.0"/>
+</graphics>
+<name>
+<value>end</value>
+<graphics>
+<offset x="58.0" y="18.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="ros.x">
+<graphics>
+<position x="480.0" y="375.0"/>
+</graphics>
+<name>
+<value>ros.x</value>
+<graphics>
+<offset x="0.0" y="-1.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="ros.x.not">
+<graphics>
+<position x="480.0" y="135.0"/>
+</graphics>
+<name>
+<value>ros.x.not</value>
+<graphics>
+<offset x="-14.0" y="19.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="start">
+<graphics>
+<position x="405.0" y="255.0"/>
+</graphics>
+<name>
+<value>start</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,1</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<transition id="T1">
+<graphics>
+<position x="480.0" y="210.0"/>
+</graphics>
+<name>
+<value>T1</value>
+<graphics>
+<offset x="45.0" y="9.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="T2">
+<graphics>
+<position x="480.0" y="300.0"/>
+</graphics>
+<name>
+<value>T2</value>
+<graphics>
+<offset x="-5.0" y="35.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<arc id="P0 to T2" source="start" target="T1">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="427" y="256" curvePoint="false"/>
+<arcpath id="001" x="486" y="222" curvePoint="true"/>
+<type value="normal"/>
+</arc>
+<arc id="P0 to T3" source="start" target="T2">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="427" y="278" curvePoint="false"/>
+<arcpath id="001" x="486" y="312" curvePoint="true"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.x.not to T1" source="ros.x.not" target="T1">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="492" y="161" curvePoint="false"/>
+<arcpath id="001" x="492" y="207" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.x to T2" source="ros.x" target="T2">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="492" y="372" curvePoint="false"/>
+<arcpath id="001" x="492" y="327" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="T1 to start" source="T1" target="start">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="492" y="237" curvePoint="false"/>
+<arcpath id="001" x="496" y="246" curvePoint="false"/>
+<arcpath id="002" x="431" y="267" curvePoint="true"/>
+<type value="normal"/>
+</arc>
+<arc id="T2 to end" source="T2" target="end">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="496" y="312" curvePoint="false"/>
+<arcpath id="001" x="556" y="277" curvePoint="true"/>
+<type value="normal"/>
+</arc>
+</net>
+</pnml>
