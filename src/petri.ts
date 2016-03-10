@@ -242,7 +242,7 @@ module petri {
 			if (result.type != 'place') { throw new Error("Only places can be used as net end");}
 			var place = <Place>result.node;
 			place.isEnd = true;
-			return place.subject.toPromise();
+			return place.subject.toPromise(Promise);
 		}
 
 		/**
