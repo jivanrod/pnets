@@ -3,6 +3,7 @@ import events = require('events');
 import Rx = require('rx');
 import xml2js = require('xml2js');
 import {Promise} from 'es6-promise';
+import {Matrix,Vector} from 'mathlib';
 
 /**
 * Petri nets module
@@ -98,7 +99,7 @@ module petri {
 		}
 
 		init() {
-			console.log("Initializing place: "+this.name);
+			//console.log("Initializing place: "+this.name);
 		}
 
 		/**
@@ -139,10 +140,10 @@ module petri {
 
 		init(execType: string) {
 			this.execType = execType;
-			console.log("Initializing transition: "+this.name);
+			//console.log("Initializing transition: "+this.name);
 			_.forEach(this.inputArcs, (arc: Arc) => {
 				// Subscribe to nodes
-				console.log(this.name+" subscribing to "+arc.inputNode.name);
+				//console.log(this.name+" subscribing to "+arc.inputNode.name);
 				arc.sub = arc.observable.subscribe(this.subject);
 			})
 			this.sub = this.subject.subscribe(
@@ -244,6 +245,9 @@ module petri {
 		transitions: Transition[] = [];
 		places: Place[] = [];
 		arcs: Arc[] = [];
+		Pre: Matrix;
+		Post: Matrix;
+		C: Matrix;
 
 		constructor() {
 		}
@@ -273,13 +277,14 @@ module petri {
 		* @param nodeId ID of the node
 		* @return Returns object with handle to the node and node type if found, undefined otherwise
 		*/
-		findNode(nodeId: string): { node: Node, type: string } {
+		findNode(nodeId: string): { node: Node, type: string, index: number } {
 			var checkP = _.find(this.places, (p) => { return p.name == nodeId});
 			// If node found in places array
 			if (checkP !== undefined){
 				return {
 					node: checkP,
-					type: 'place'
+					type: 'place',
+					index: _.findIndex(this.places, (p) => { return p.name == nodeId})
 				}
 			}
 			// Else, check transitions
@@ -287,7 +292,8 @@ module petri {
 			if (checkT !== undefined){
 				return {
 					node: checkT,
-					type: 'transition'
+					type: 'transition',
+					index: _.findIndex(this.transitions, (t) => { return t.name == nodeId})
 				}
 			}
 			// If neither place nor transition, return undefined
@@ -326,6 +332,91 @@ module petri {
 			place.addTokens(tokens);
 		}
 
+		buildMath(){
+			// Building C = Post - Pre
+			this.C = Matrix.zero(this.places.length,this.transitions.length);
+			this.Pre = Matrix.zero(this.places.length,this.transitions.length);
+			this.Post = Matrix.zero(this.places.length,this.transitions.length);
+			_.each(this.arcs, (arc) => {
+				var input = this.findNode(arc.inputNode.name);
+				var output = this.findNode(arc.outputNode.name);
+				var i = input.index;
+				var j = output.index;
+				if (input.type == 'place'){
+					this.Pre[i][j] = arc.m;
+				}
+				else {
+					this.Post[j][i] = arc.m;
+				}
+			});
+			this.C = this.Post.minus(this.Pre);
+		}
+
+		getMarking(){
+			var M = Vector.zero(this.places.length);
+			_.each(this.places, (place, index) => {
+				M[index] = place.tokens.length;
+			});
+			return M;
+		}
+
+		minExp(M: Vector, t: string){ // Implementing $Y_{min}(M,t)$ from Giua et al. 2013 (11cep.pdf)
+			var tInd = this.findNode(t).index;
+			console.log("Calculating minumum explanation for transition "+t+" from Marking:");
+			console.log(M.toString());
+			var m = this.places.length;
+			var n = this.transitions.length;
+			// 1. Let Gamma = ...
+			var ct = this.C.transpose();
+			var temp = this.Pre.toColVectors()[tInd]; // Get last column
+			var A = <Vector[]>[];
+			var B = <Vector[]>[];
+			A.push(M.minus(temp));
+			B.push(Vector.zero(n));
+			var negEntry = (A) => {
+				var r = { i: -1, j: -1};
+				_.forEach(A, (v, ind) => {
+					var col = v.reduce( (neg,val,index) => { return val < 0 ? index : neg},-1);
+					if (col > 0){ r.i = parseInt(ind); r.j = col };
+				})
+				return (r.i<0) ? null : r;
+			}
+
+			console.log("C transpose");
+			console.log(ct.toString());
+			console.log("Start A:");
+			_.each(A, (a) => { console.log(a.toString()) });
+
+			var k = negEntry(A);
+			console.log("Start k:")
+			console.log(k);
+			// 2. While A has negative entries
+			while (k){
+				// 2.2
+				var i_plus = ct.toRowVectors().reduce( (list,row,index) => {
+					if (row[k.j] > 0) { return list.concat([index]);}
+					else { return list;}
+				},[]);
+				console.log("Adding "+i_plus.length+" lines to A | B");
+				// 2.3
+				_.each(i_plus, (ii) => {
+					var newA = A[k.i].plus( ct.toRowVectors()[ii] );
+					var newB = B[k.i]; newB[ii] +=1;
+					A.push( newA );
+					B.push( newB );
+				});
+				// 2.4
+				A.splice(k.i,1); B.splice(k.i,1);
+				k = negEntry(A);
+				console.log("New A:");
+				_.each(A, (a) => { console.log(a.toString()) });
+				console.log("New k:");
+				console.log(k);
+			}
+			// 3
+			console.log("B final:");
+			_.each(B, (b) => { console.log(b.toString()) });
+		}
 
 		/**
 		* Static function to create Net from Pnml
@@ -366,7 +457,8 @@ module petri {
 				// Importing arcs
 				var arcs = results['pnml']['net'][0]['arc'];
 				_.forEach(arcs, (arc) => {
-					net.addArc(arc['$']['source'],arc['$']['target'],1);
+					var multiplicity = <number>arc['inscription'][0]['value'][0].split(',')[1];
+					net.addArc(arc['$']['source'],arc['$']['target'],1*multiplicity); // 1* to force number
 				});
 			});
 			return net;

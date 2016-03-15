@@ -1,5 +1,6 @@
 import events = require('events');
 import Rx = require('rx');
+import { Matrix, Vector } from 'mathlib';
 declare module petri {
     class Arc {
         type: string;
@@ -56,15 +57,22 @@ declare module petri {
         transitions: Transition[];
         places: Place[];
         arcs: Arc[];
+        Pre: Matrix;
+        Post: Matrix;
+        C: Matrix;
         constructor();
         init(execType?: string): void;
         makeEnd(endPlace: string): Rx.IPromise<any>;
         findNode(nodeId: string): {
             node: Node;
             type: string;
+            index: number;
         };
         addArc(sourceId: string, targetId: string, m: number): void;
         ingest(nodeId: string, count?: number): void;
+        buildMath(): void;
+        getMarking(): Vector;
+        minExp(M: Vector, t: string): void;
         static fromPnml(xmlString: string, extensions?: any): Net;
     }
 }

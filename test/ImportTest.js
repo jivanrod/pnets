@@ -15,12 +15,10 @@ describe('PNML Import', function () {
     it('should initialize the net', function () {
         net.init();
     });
-    it('should insert a token in start place and run it', function (done) {
-        this.timeout(10000);
-        net.init();
+    it('should calculate math stuff on the net', function () {
         net.ingest('start', 3);
-        net.makeEnd('end').then(function () {
-            done();
-        });
+        net.buildMath();
+        console.log("After build math");
+        net.minExp(net.getMarking(), 'T4');
     });
 });
