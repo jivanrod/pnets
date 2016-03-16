@@ -382,10 +382,10 @@ module petri {
 				return (r.i<0) ? null : r;
 			}
 
-			console.log("C transpose");
-			console.log(ct.toString());
-			console.log("Start A:");
-			_.each(A, (a) => { console.log(a.toString()) });
+			//console.log("C transpose");
+			//console.log(ct.toString());
+			//console.log("Start A:");
+			//_.each(A, (a) => { console.log(a.toString()) });
 
 			var k = negEntry(A);
 			console.log("Start k:")
@@ -397,7 +397,7 @@ module petri {
 					if (row[k.j] > 0) { return list.concat([index]);}
 					else { return list;}
 				},[]);
-				console.log("Adding "+i_plus.length+" lines to A | B");
+				//console.log("Adding "+i_plus.length+" lines to A | B");
 				// 2.3
 				_.each(i_plus, (ii) => {
 					var newA = A[k.i].plus( ct.toRowVectors()[ii] );
@@ -408,10 +408,10 @@ module petri {
 				// 2.4
 				A.splice(k.i,1); B.splice(k.i,1);
 				k = negEntry(A);
-				console.log("New A:");
-				_.each(A, (a) => { console.log(a.toString()) });
-				console.log("New k:");
-				console.log(k);
+				//console.log("New A:");
+				//_.each(A, (a) => { console.log(a.toString()) });
+				//console.log("New k:");
+				//console.log(k);
 			}
 			// 3
 			console.log("B final:");
