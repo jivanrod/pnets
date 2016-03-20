@@ -16,14 +16,17 @@ describe('PNML Import', function () {
         net.init();
     });
     it('should force fire a transition', function (done) {
-        this.timeout(0);
+        this.timeout(100000);
         net.init('Obs');
         net.makeEnd('end').then(function () {
+            console.log("Pnet reached end state");
             done();
         });
         net.ingest('start', 3);
-        net.minExp(net.getMarking(), 'ros.SelectFlaps2');
-        net.fire('ros.SelectFlaps2');
+        net.ingest('ros.AtGreenDotSpeed', 100);
+        net.ingest('ros.2000AGL', 100);
+        net.ingest('ros.VFE1', 100);
         console.log(net.getMarking().toString());
+        net.basisMarkings(net.getMarking(), 'ros.SelectFlaps3');
     });
 });

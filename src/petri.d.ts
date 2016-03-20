@@ -80,7 +80,8 @@ declare module petri {
         ingest(nodeId: string, count?: number): void;
         buildMath(): void;
         getMarking(): Vector;
-        minExp(M: Vector, t: string): void;
+        minExp(M: Vector, t: string): Vector[];
+        basisMarkings(M0: Vector, t: string): any[];
         static fromPnml(xmlString: string, extensions?: any): Net;
     }
 }

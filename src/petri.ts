@@ -418,7 +418,10 @@ module petri {
 			return M;
 		}
 
-		minExp(M: Vector, t: string){ // Implementing $Y_{min}(M,t)$ from Giua et al. 2013 (11cep.pdf)
+		/**
+		* Calculates minimal e-vector $Y_{min}(M,t)$ (from Giua et al. 2013 (11cep.pdf))
+		*/
+		minExp(M: Vector, t: string){
 			var tInd = this.findNode(t).index;
 			console.log("Calculating minumum explanation for transition "+t+" from Marking:");
 			console.log(M.toString());
@@ -440,14 +443,7 @@ module petri {
 				return (r.i<0) ? null : r;
 			}
 
-			//console.log("C transpose");
-			//console.log(ct.toString());
-			//console.log("Start A:");
-			//_.each(A, (a) => { console.log(a.toString()) });
-
 			var k = negEntry(A);
-			console.log("Start k:")
-			console.log(k);
 			// 2. While A has negative entries
 			while (k){
 				// 2.2
@@ -455,7 +451,6 @@ module petri {
 					if (row[k.j] > 0) { return list.concat([index]);}
 					else { return list;}
 				},[]);
-				//console.log("Adding "+i_plus.length+" lines to A | B");
 				// 2.3
 				_.each(i_plus, (ii) => {
 					var newA = A[k.i].plus( ct.toRowVectors()[ii] );
@@ -466,14 +461,32 @@ module petri {
 				// 2.4
 				A.splice(k.i,1); B.splice(k.i,1);
 				k = negEntry(A);
-				//console.log("New A:");
-				//_.each(A, (a) => { console.log(a.toString()) });
-				//console.log("New k:");
-				//console.log(k);
 			}
 			// 3
 			console.log("B final:");
 			_.each(B, (b) => { console.log(b.toString()) });
+			return B;
+		}
+
+		/**
+		* Basis marking set
+		*/
+		basisMarkings(M0: Vector, t: string){
+			var tInd = this.findNode(t).index;
+			var m = this.places.length;
+			var n = this.transitions.length;
+			var Mbar = [{ m: M0, y: Vector.zero(n), g: Vector.zero(n)}];
+			var pM = [];
+			// 6.1.1
+			var Ymin = this.minExp(M0,t);
+			_.each(Ymin, (e: Vector) => {
+				var ct = this.C.toColVectors()[tInd];
+				var MM = M0.plus(this.C.times(e).plus(ct)); // 6.1.1.1
+				pM.push(MM);
+			})
+			console.log("Potential new states");
+			_.each(pM, (b) => { console.log(b.toString()) });
+			return pM;
 		}
 
 		/**
