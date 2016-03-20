@@ -18,7 +18,7 @@ module petri {
 		public outputNode: Node = null;
 		public m: number = 1;
 		public sub: Rx.Disposable = null;
-		public observable: Rx.Observable<string> = null;
+		public observable: Rx.Observable<Arc> = null;
 		public observer: Rx.Observer<any> = null;
 		constructor(input: Node, output: Node, m: number, public type: string = 'default') {
 			this.inputNode = input;
@@ -26,9 +26,9 @@ module petri {
 			this.m = m;
 			this.inputNode.outputArcs.push(this);
 			this.outputNode.inputArcs.push(this);
-			this.observable = Rx.Observable.create<string>( (obs) => {
+			this.observable = Rx.Observable.create<Arc>( (obs) => {
 				this.sub = this.inputNode.subject.subscribe(
-					(x) => { obs.onNext(this.type); },
+					(x) => { obs.onNext(this); },
 					(err) => { throw new Error(err);},
 					() => { console.log("Arc of type "+this.type+" completed");}
 				)
@@ -131,6 +131,7 @@ module petri {
 	export class Transition extends Node {
 		protected execType: string = 'default';
 		protected executeFn: (tokens: Token[]) => Promise<string>
+		public arcObserver: Rx.Observer<Arc>;
 		constructor(public name: string) {
 			super(name);
 			this.subject = new Rx.Subject();
@@ -141,39 +142,47 @@ module petri {
 		init(execType: string) {
 			this.execType = execType;
 			//console.log("Initializing transition: "+this.name);
-			_.forEach(this.inputArcs, (arc: Arc) => {
-				// Subscribe to nodes
-				//console.log(this.name+" subscribing to "+arc.inputNode.name);
-				arc.sub = arc.observable.subscribe(this.subject);
-			})
-			this.sub = this.subject.subscribe(
-				(type: string) => {
-					console.log("Checking transition "+this.name+" in mode "+type);
+			this.arcObserver = Rx.Observer.create(
+				(arc: Arc) => {
 					// Iterating across input nodes to check firing
-					var enabled = this.enabled(type);
+					var enabled = this.enabled(arc.type);
 					// If conditions not satisfied, do nothing
 					if (!enabled) { return; }
 					// If transition enabled but Net in other execution mode, log
-					if (type != this.execType){
-						return console.log(this.name + " would have fired in "+type+" mode.");
+					if (arc.type != this.execType){
+						return console.log(this.name + " would have fired in "+arc.type+" mode.");
 					}
 					// If transition enabled in Net execution mode, consume and fire.
-					var tokens = this.consume(type);
+					var tokens = this.consume(arc.type);
 					this.execute(tokens).then( () => {
-						console.log("Task "+this.name+" completed");
-						_.forEach(this.outputArcs, (arc: Arc) => {
-							var tokens = _.times(arc.m, () => { return new Token() });
-							(<Place>arc.outputNode).addTokens(tokens);
-						})
+						this.fire();
 					});
-				},
-				(err) => {
-					console.error(err);
-				},
-				() => {
-					console.log("Done");
+				}, (err) => { console.error(err); }, () => { console.log("Done"); }
+			);
+			// Registering arc observer to all transition input arcs
+			_.forEach(this.inputArcs, (arc: Arc) => {
+				// Subscribe to nodes
+				arc.sub = arc.observable.subscribe(this.arcObserver);
+			})
+		}
+
+		/**
+		* Forcing transition firing (Interesting for debugging)
+		*/
+		fire(type: string = 'default') {
+				// Checking if transition was enabled on a certain type
+				var enabled = this.enabled(type);
+				// If not enabled, we file a mismatch
+				if (!enabled){
+					console.log("Transition "+this.name+" force fired prematurely")
 				}
-			)
+				// Notifying transition observers
+				this.subject.onNext(this.name);
+				// Feeding downstream tokens (could be done using observers)
+				_.forEach(this.outputArcs, (arc: Arc) => {
+					var tokens = _.times(arc.m, () => { return new Token() });
+					(<Place>arc.outputNode).addTokens(tokens);
+				})
 		}
 
 		/**
@@ -248,8 +257,25 @@ module petri {
 		Pre: Matrix;
 		Post: Matrix;
 		C: Matrix;
+		perplex: number;
+		arcSubject: Rx.Subject<any>;
+		transitionSubject: Rx.Subject<any>;
 
 		constructor() {
+			this.arcSubject = new Rx.Subject<any>();
+			this.transitionSubject = new Rx.Subject<any>();
+
+			// Basic net logging
+			this.arcSubject.subscribe(
+				(arc) => { },
+				(err) => { throw new Error(err);},
+				() => { console.log("Arc completed");}
+			);
+			this.transitionSubject.subscribe(
+				(t) => { console.log(t+ " fired")},
+				(err) => { throw new Error(err);},
+				() => { console.log("Transition completed");}
+			);
 		}
 
 		/**
@@ -258,6 +284,7 @@ module petri {
 		init(execType: string = 'default'){
 			_.forEach(this.transitions, (t) => { t.init(execType) });
 			_.forEach(this.places, (p) => { p.init(); });
+			this.buildMath();
 		}
 
 		/**
@@ -301,6 +328,22 @@ module petri {
 		}
 
 		/**
+		* Adds place to petri net
+		*/
+		addPlace(pHandle: Place){
+			//pHandle.subject.subscribe(this.placeObserver);
+			this.places.push(pHandle);
+		}
+
+		/**
+		* Adds transition to petri net
+		*/
+		addTransition(tHandle: Transition){
+			tHandle.subject.subscribe(this.transitionSubject);
+			this.transitions.push(tHandle);
+		}
+
+		/**
 		* Adds arc with multiplicity
 		* @param sourceId Id of the source node
 		* @param targetId Id of the target node
@@ -315,7 +358,22 @@ module petri {
 			if (source.type == target.type){
 				throw new Error("Can't create arc between two nodes of same type");
 			}
-			this.arcs.push(new Arc(source.node, target.node, m));
+			// Subscribing net and creating arc
+			var arc = new Arc(source.node, target.node, m);
+			arc.observable.subscribe(this.arcSubject);
+			this.arcs.push(arc);
+		}
+
+		/**
+		* Force-fires transition in net
+		* @param nodeId String ID of the transition
+		*/
+		fire(nodeId: string, type: string = 'default'){
+			var node = this.findNode(nodeId);
+			if (node === undefined) { throw new Error("Node "+nodeId+" doesn't exist")}
+			if (node.type != 'transition'){ throw new Error("Place node cannot be fired")}
+			var t = <Transition>node.node;
+			t.fire(type);
 		}
 
 		/**
@@ -447,12 +505,12 @@ module petri {
 				_.forEach(places, (pl) => {
 					var pId = pl['$']['id'];
 					var pClass = placeClass(pId)
-					net.places.push(new pClass(pId));
+					net.addPlace(new pClass(pId));
 				});
 				// Importing transitions
 				var transitions = results['pnml']['net'][0]['transition'];
 				_.forEach(transitions, (t) => {
-					net.transitions.push(new TimedTransition(t['$']['id'],1));
+					net.addTransition(new TimedTransition(t['$']['id'],1));
 				});
 				// Importing arcs
 				var arcs = results['pnml']['net'][0]['arc'];

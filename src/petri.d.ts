@@ -8,7 +8,7 @@ declare module petri {
         outputNode: Node;
         m: number;
         sub: Rx.Disposable;
-        observable: Rx.Observable<string>;
+        observable: Rx.Observable<Arc>;
         observer: Rx.Observer<any>;
         constructor(input: Node, output: Node, m: number, type?: string);
     }
@@ -42,8 +42,10 @@ declare module petri {
         name: string;
         protected execType: string;
         protected executeFn: (tokens: Token[]) => Promise<string>;
+        arcObserver: Rx.Observer<Arc>;
         constructor(name: string);
         init(execType: string): void;
+        fire(type?: string): void;
         implement(fn: (tokens: Token[]) => Promise<string>): void;
         enabled(type?: string): boolean;
         consume(type?: string): Token[];
@@ -60,6 +62,9 @@ declare module petri {
         Pre: Matrix;
         Post: Matrix;
         C: Matrix;
+        perplex: number;
+        arcSubject: Rx.Subject<any>;
+        transitionSubject: Rx.Subject<any>;
         constructor();
         init(execType?: string): void;
         makeEnd(endPlace: string): Rx.IPromise<any>;
@@ -68,7 +73,10 @@ declare module petri {
             type: string;
             index: number;
         };
+        addPlace(pHandle: Place): void;
+        addTransition(tHandle: Transition): void;
         addArc(sourceId: string, targetId: string, m: number): void;
+        fire(nodeId: string, type?: string): void;
         ingest(nodeId: string, count?: number): void;
         buildMath(): void;
         getMarking(): Vector;
