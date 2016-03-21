@@ -51,11 +51,12 @@ describe('PNML Import', () => {
     net.ingest('ros.AtGreenDotSpeed',100);
     net.ingest('ros.2000AGL',100);
     net.ingest('ros.VFE1',100);
+    net.ingest('ros.VFE2',100);
 
     console.log(net.getMarking().toString());
 
     //net.minExp(net.getMarking(),'ros.SelectFlaps3');
-    net.basisMarkings(net.getMarking(),'ros.SelectFlaps3');
+    net.basisMarkings(net.getMarking(),'selectFull');
     //net.fire('ros.SelectFlaps3');
     //console.log(net.getMarking().toString());
   })

@@ -150,7 +150,8 @@ module petri {
 					if (!enabled) { return; }
 					// If transition enabled but Net in other execution mode, log
 					if (arc.type != this.execType){
-						return console.log(this.name + " would have fired in "+arc.type+" mode.");
+						return;
+						//return console.log(this.name + " would have fired in "+arc.type+" mode.");
 					}
 					// If transition enabled in Net execution mode, consume and fire.
 					var tokens = this.consume(arc.type);
@@ -169,7 +170,7 @@ module petri {
 		/**
 		* Forcing transition firing (Interesting for debugging)
 		*/
-		fire(type: string = 'default') {
+		fire(type: string = 'default'): boolean {
 				// Checking if transition was enabled on a certain type
 				var enabled = this.enabled(type);
 				// If not enabled, we file a mismatch
@@ -183,6 +184,7 @@ module petri {
 					var tokens = _.times(arc.m, () => { return new Token() });
 					(<Place>arc.outputNode).addTokens(tokens);
 				})
+				return enabled;
 		}
 
 		/**
@@ -260,6 +262,10 @@ module petri {
 		perplex: number;
 		arcSubject: Rx.Subject<any>;
 		transitionSubject: Rx.Subject<any>;
+		supriseIndex: number = 0;
+		pIndex: number = 0;
+		pIndexLUT: number = 0;
+		pIndexFUT: number = 0;
 
 		constructor() {
 			this.arcSubject = new Rx.Subject<any>();
@@ -267,7 +273,17 @@ module petri {
 
 			// Basic net logging
 			this.arcSubject.subscribe(
-				(arc) => { },
+				(arc) => {
+					// Updating perplexity
+					var t1 = this.pIndexLUT;
+					var t2 = new Date().getTime();
+					var diff = t2 - t1;
+					var simTasks = _.reduce(this.transitions, (tot, t) => {
+						return t.enabled() ? (tot + 1) : tot
+					},0);
+					this.pIndex += simTasks * diff;
+					this.pIndexLUT = t2;
+				},
 				(err) => { throw new Error(err);},
 				() => { console.log("Arc completed");}
 			);
@@ -368,12 +384,20 @@ module petri {
 		* Force-fires transition in net
 		* @param nodeId String ID of the transition
 		*/
-		fire(nodeId: string, type: string = 'default'){
+		fire(nodeId: string, update: boolean = false, type: string = 'default'){
 			var node = this.findNode(nodeId);
 			if (node === undefined) { throw new Error("Node "+nodeId+" doesn't exist")}
 			if (node.type != 'transition'){ throw new Error("Place node cannot be fired")}
 			var t = <Transition>node.node;
-			t.fire(type);
+			var pMarkings = this.basisMarkings(this.getMarking(),nodeId);
+			var wasReady = t.fire(type);
+			// To be cleanup surprise index calculation
+			this.supriseIndex += (wasReady ? 0 : 1 );
+			if (update){
+				if (pMarkings.length > 0){
+					this.setMarking(pMarkings[0]);
+				}
+			}
 		}
 
 		/**
@@ -382,6 +406,8 @@ module petri {
 		* @param count Number of tokens to be added (default:1)
 		*/
 		ingest(nodeId: string, count: number = 1) {
+			// To be cleanup, perplexity calculation
+			this.pIndexLUT = this.pIndexFUT = new Date().getTime();
 			var node = this.findNode(nodeId);
 			if (node === undefined) { throw new Error("Node "+nodeId+" doesn't exist")}
 			if (node.type != 'place'){ throw new Error("Transition node can't ingest")}
@@ -390,6 +416,9 @@ module petri {
 			place.addTokens(tokens);
 		}
 
+		/**
+		* Building algebraic structures used for some algorithms
+		*/
 		buildMath(){
 			// Building C = Post - Pre
 			this.C = Matrix.zero(this.places.length,this.transitions.length);
@@ -410,6 +439,10 @@ module petri {
 			this.C = this.Post.minus(this.Pre);
 		}
 
+		/**
+		* Gets the current marking as a Mathlib Vector
+		* @return Returns the current marking
+		*/
 		getMarking(){
 			var M = Vector.zero(this.places.length);
 			_.each(this.places, (place, index) => {
@@ -419,7 +452,18 @@ module petri {
 		}
 
 		/**
+		* Sets the marking of the petri net
+		* @param M Marking to replace the current one
+		*/
+		setMarking(M: Vector){
+			_.each(this.places, (place, index) => {
+				place.tokens = _.times(M[index], () => { return new Token() });
+			});
+		}
+
+		/**
 		* Calculates minimal e-vector $Y_{min}(M,t)$ (from Giua et al. 2013 (11cep.pdf))
+		* Returns an array of minimal e-vectors
 		*/
 		minExp(M: Vector, t: string){
 			var tInd = this.findNode(t).index;
@@ -469,7 +513,8 @@ module petri {
 		}
 
 		/**
-		* Basis marking set
+		* Basis marking set (as calculated in Cabasino and Giua, Algorithm 11)
+		* @return Returns an array containing the basis marking set
 		*/
 		basisMarkings(M0: Vector, t: string){
 			var tInd = this.findNode(t).index;

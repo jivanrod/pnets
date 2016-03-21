@@ -45,7 +45,7 @@ declare module petri {
         arcObserver: Rx.Observer<Arc>;
         constructor(name: string);
         init(execType: string): void;
-        fire(type?: string): void;
+        fire(type?: string): boolean;
         implement(fn: (tokens: Token[]) => Promise<string>): void;
         enabled(type?: string): boolean;
         consume(type?: string): Token[];
@@ -65,6 +65,10 @@ declare module petri {
         perplex: number;
         arcSubject: Rx.Subject<any>;
         transitionSubject: Rx.Subject<any>;
+        supriseIndex: number;
+        pIndex: number;
+        pIndexLUT: number;
+        pIndexFUT: number;
         constructor();
         init(execType?: string): void;
         makeEnd(endPlace: string): Rx.IPromise<any>;
@@ -76,10 +80,11 @@ declare module petri {
         addPlace(pHandle: Place): void;
         addTransition(tHandle: Transition): void;
         addArc(sourceId: string, targetId: string, m: number): void;
-        fire(nodeId: string, type?: string): void;
+        fire(nodeId: string, update?: boolean, type?: string): void;
         ingest(nodeId: string, count?: number): void;
         buildMath(): void;
         getMarking(): Vector;
+        setMarking(M: Vector): void;
         minExp(M: Vector, t: string): Vector[];
         basisMarkings(M0: Vector, t: string): any[];
         static fromPnml(xmlString: string, extensions?: any): Net;

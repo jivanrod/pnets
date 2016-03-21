@@ -4,11 +4,11 @@ var fs = require('fs');
 var ROSLIB_1 = require('ROSLIB');
 var place_ros_1 = require('../src/extensions/places/place-ros');
 var transition_ros_1 = require('../src/extensions/transitions/transition-ros');
-var xmlString = fs.readFileSync('data/final_approach.xml', 'utf8');
+var xmlString = fs.readFileSync('data/final_approach_3.xml', 'utf8');
 describe('Ros Places', function () {
     var net;
     var ros;
-    var rate = 10.0;
+    var rate = 50.0;
     before(function () {
         net = petri_1.Net.fromPnml(xmlString, {
             'ros': {
@@ -36,17 +36,55 @@ describe('Ros Places', function () {
     });
     it('should initialize the Ros-connected net', function (done) {
         this.timeout(0);
-        net.init();
-        var n1 = (net.findNode('ros.AtGreenDotSpeed').node);
-        n1.initRos('/sim/values/flightmodel/aircraft/position/airspeed_indicated_kts', 'std_msgs/Float32', place_ros_1.RosPlace.LT(200), 10000.0 / rate, ros);
-        var n2 = (net.findNode('ros.2000AGL').node);
-        n2.initRos('/sim/values/flightmodel/aircraft/position/altitude_indicated_ft', 'std_msgs/Float32', place_ros_1.RosPlace.LT(2000 + 1089), 3000.0 / rate, ros);
-        var n3 = (net.findNode('ros.VFE1').node);
-        n3.initRos('/sim/values/flightmodel/aircraft/position/airspeed_indicated_kts', 'std_msgs/Float32', place_ros_1.RosPlace.LT(185), 2000.0 / rate, ros);
-        var n4 = (net.findNode('ros.VFE2').node);
-        n4.initRos('/sim/values/flightmodel/aircraft/position/airspeed_indicated_kts', 'std_msgs/Float32', place_ros_1.RosPlace.LT(177), 2000.0 / rate, ros);
-        net.ingest('start', 1);
+        net.init('Obs');
+        var addRosObs = function (topic, type, fn, throttle) {
+            if (throttle === void 0) { throttle = 1000 / rate; }
+            var tHandle = new ROSLIB_1.Topic({
+                ros: ros,
+                name: topic,
+                messageType: type,
+                throttle_rate: throttle
+            });
+            tHandle.subscribe(fn);
+        };
+        var flapState = 0;
+        addRosObs('/sim/values/cockpit/controls/flap_request_ratio', 'std_msgs/Float32', function (msg) {
+            switch (flapState) {
+                case 0:
+                    if (msg.data > 0.15) {
+                        net.fire('SelectFlaps1', true);
+                        flapState = 1;
+                    }
+                    break;
+                case 1:
+                    if (msg.data > 0.39) {
+                        net.fire('SelectFlaps2', true);
+                        flapState = 2;
+                    }
+                    break;
+                case 2:
+                    if (msg.data > 0.60) {
+                        net.fire('SelectFlaps3', true);
+                        flapState = 3;
+                    }
+                    break;
+                case 3:
+                    if (msg.data > 0.95) {
+                        net.fire('selectFull', true);
+                        flapState = 4;
+                    }
+                    break;
+            }
+        });
+        addRosObs('/sim/commands', 'std_msgs/String', function (msg) {
+            if (msg.data == '/controls/autobrake/med_toggle') {
+                net.fire('LdgGear', true);
+            }
+        });
+        net.ingest('start', 4);
         net.makeEnd('end').then(function () {
+            console.log("Perplexity: " + 1.0 * net.pIndex / (1.0 * net.pIndexLUT - 1.0 * net.pIndexFUT));
+            console.log("Surprise: " + net.supriseIndex);
             done();
         });
     });

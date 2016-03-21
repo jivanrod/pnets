@@ -26,7 +26,8 @@ describe('PNML Import', function () {
         net.ingest('ros.AtGreenDotSpeed', 100);
         net.ingest('ros.2000AGL', 100);
         net.ingest('ros.VFE1', 100);
+        net.ingest('ros.VFE2', 100);
         console.log(net.getMarking().toString());
-        net.basisMarkings(net.getMarking(), 'ros.SelectFlaps3');
+        net.basisMarkings(net.getMarking(), 'selectFull');
     });
 });
