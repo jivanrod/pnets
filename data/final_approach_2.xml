@@ -1,0 +1,497 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><pnml>
+<net id="Net-One" type="P/T net">
+<token id="Default" enabled="true" red="0" green="0" blue="0"/>
+<place id="end">
+<graphics>
+<position x="645.0" y="270.0"/>
+</graphics>
+<name>
+<value>end</value>
+<graphics>
+<offset x="28.0" y="-13.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="p1">
+<graphics>
+<position x="270.0" y="270.0"/>
+</graphics>
+<name>
+<value>p1</value>
+<graphics>
+<offset x="18.0" y="45.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="p2">
+<graphics>
+<position x="390.0" y="240.0"/>
+</graphics>
+<name>
+<value>p2</value>
+<graphics>
+<offset x="47.0" y="24.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="p3">
+<graphics>
+<position x="450.0" y="285.0"/>
+</graphics>
+<name>
+<value>p3</value>
+<graphics>
+<offset x="26.0" y="41.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="p4">
+<graphics>
+<position x="540.0" y="240.0"/>
+</graphics>
+<name>
+<value>p4</value>
+<graphics>
+<offset x="24.0" y="-14.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="ros.AtGreenDotSpeed">
+<graphics>
+<position x="135.0" y="240.0"/>
+</graphics>
+<name>
+<value>ros.AtGreenDotSpeed</value>
+<graphics>
+<offset x="53.0" y="-20.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="ros.VFE1">
+<graphics>
+<position x="435.0" y="210.0"/>
+</graphics>
+<name>
+<value>ros.VFE1</value>
+<graphics>
+<offset x="53.0" y="-10.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="ros.VFE2">
+<graphics>
+<position x="585.0" y="195.0"/>
+</graphics>
+<name>
+<value>ros.VFE2</value>
+<graphics>
+<offset x="1.0" y="-2.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="start">
+<graphics>
+<position x="135.0" y="300.0"/>
+</graphics>
+<name>
+<value>start</value>
+<graphics>
+<offset x="7.0" y="-1.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<transition id="LdgGear">
+<graphics>
+<position x="405.0" y="285.0"/>
+</graphics>
+<name>
+<value>LdgGear</value>
+<graphics>
+<offset x="28.0" y="42.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="SelectFlaps1">
+<graphics>
+<position x="195.0" y="270.0"/>
+</graphics>
+<name>
+<value>SelectFlaps1</value>
+<graphics>
+<offset x="67.0" y="-17.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="SelectFlaps2">
+<graphics>
+<position x="345.0" y="240.0"/>
+</graphics>
+<name>
+<value>SelectFlaps2</value>
+<graphics>
+<offset x="58.0" y="-14.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="SelectFlaps3">
+<graphics>
+<position x="495.0" y="240.0"/>
+</graphics>
+<name>
+<value>SelectFlaps3</value>
+<graphics>
+<offset x="53.0" y="-17.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="selectFull">
+<graphics>
+<position x="585.0" y="270.0"/>
+</graphics>
+<name>
+<value>selectFull</value>
+<graphics>
+<offset x="40.0" y="49.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<arc id="LdgGear to p3" source="LdgGear" target="p3">
+<graphics/>
+<inscription>
+<value>Default,2</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="420" y="296" curvePoint="false"/>
+<arcpath id="001" x="446" y="296" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="p1 to LdgGear" source="p1" target="LdgGear">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="296" y="283" curvePoint="false"/>
+<arcpath id="001" x="410" y="296" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="p1 to ros.SelectFlaps2" source="p1" target="SelectFlaps2">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="294" y="275" curvePoint="false"/>
+<arcpath id="001" x="350" y="251" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="p3 to ros.SelectFlaps3" source="p2" target="SelectFlaps3">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="416" y="252" curvePoint="false"/>
+<arcpath id="001" x="500" y="256" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="p3 to selectFull" source="p3" target="selectFull">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="476" y="295" curvePoint="false"/>
+<arcpath id="001" x="590" y="286" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="p4 to ros.selectFull" source="p4" target="selectFull">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="563" y="259" curvePoint="false"/>
+<arcpath id="001" x="591" y="276" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.AtGreenDotSpeed to ros.SelectFlaps1" source="ros.AtGreenDotSpeed" target="SelectFlaps1">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="160" y="257" curvePoint="false"/>
+<arcpath id="001" x="201" y="276" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.SelectFlaps1 to p1" source="SelectFlaps1" target="p1">
+<graphics/>
+<inscription>
+<value>Default,2</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="210" y="281" curvePoint="false"/>
+<arcpath id="001" x="266" y="280" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.SelectFlaps3 to p4" source="SelectFlaps3" target="p4">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="510" y="251" curvePoint="false"/>
+<arcpath id="001" x="536" y="250" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.selectFull to end" source="selectFull" target="end">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="600" y="281" curvePoint="false"/>
+<arcpath id="001" x="641" y="280" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.VFE1 to ros.SelectFlaps3" source="ros.VFE1" target="SelectFlaps3">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="460" y="227" curvePoint="false"/>
+<arcpath id="001" x="501" y="246" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="ros.VFE2 to ros.selectFull" source="ros.VFE2" target="selectFull">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="596" y="220" curvePoint="false"/>
+<arcpath id="001" x="596" y="266" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="SelectFlaps2 to p2" source="SelectFlaps2" target="p2">
+<graphics/>
+<inscription>
+<value>Default,2</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="360" y="251" curvePoint="false"/>
+<arcpath id="001" x="386" y="250" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="start to ros.SelectFlaps1" source="start" target="SelectFlaps1">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="160" y="304" curvePoint="false"/>
+<arcpath id="001" x="200" y="286" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+</net>
+</pnml>
