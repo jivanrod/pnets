@@ -300,7 +300,7 @@ module petri {
 		init(execType: string = 'default'){
 			_.forEach(this.transitions, (t) => { t.init(execType) });
 			_.forEach(this.places, (p) => { p.init(); });
-			//this.buildMath();
+			this.buildMath();
 		}
 
 		/**

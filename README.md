@@ -20,16 +20,24 @@ development language for scalability purposes.
 
 Todo
 
-## Development
+## Installation
 
 Clone this repository, install npm dependencies and TypeScript declarations.
 ```bash
 npm install
 typings install
 ```
+### Fix Mathlib bindings
+Copy the modified TypeScript declaration file for Mathlib from `dep` directory to `typings/main/mathlib/index.d.ts`. Also go in `node_modules/mathlib` and modify the `main` field of `package.json` to `build/commonjs/Mathlib.js`. This should get the Mathlib package working together with the rest of the petri net library.
+
 ### Run test suite
 ```bash
 npm test
+```
+
+You can also run the tests individually. For this, first install `mocha` globally.
+```
+npm install -g mocha
 ```
 
 ### Generate the documentation (Requires typedoc)
