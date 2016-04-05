@@ -156,7 +156,7 @@ module petri {
 					// If transition enabled in Net execution mode, consume and fire.
 					var tokens = this.consume(arc.type);
 					this.execute(tokens).then( () => {
-						this.fire();
+						this.fire(this.execType, true);
 					});
 				}, (err) => { console.error(err); }, () => { console.log("Done"); }
 			);
@@ -170,9 +170,9 @@ module petri {
 		/**
 		* Forcing transition firing (Interesting for debugging)
 		*/
-		fire(type: string = 'default'): boolean {
+		fire(type: string, enable: boolean = false): boolean {
 				// Checking if transition was enabled on a certain type
-				var enabled = this.enabled(type);
+				var enabled = this.enabled(type) || enable;
 				// If not enabled, we file a mismatch
 				if (!enabled){
 					console.log("Transition "+this.name+" force fired prematurely")
@@ -300,7 +300,7 @@ module petri {
 		init(execType: string = 'default'){
 			_.forEach(this.transitions, (t) => { t.init(execType) });
 			_.forEach(this.places, (p) => { p.init(); });
-			this.buildMath();
+			//this.buildMath();
 		}
 
 		/**

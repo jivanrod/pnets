@@ -45,7 +45,7 @@ declare module petri {
         arcObserver: Rx.Observer<Arc>;
         constructor(name: string);
         init(execType: string): void;
-        fire(type?: string): boolean;
+        fire(type: string, enable?: boolean): boolean;
         implement(fn: (tokens: Token[]) => Promise<string>): void;
         enabled(type?: string): boolean;
         consume(type?: string): Token[];

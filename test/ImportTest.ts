@@ -2,7 +2,7 @@
 import {Net} from '../src/petri';
 import fs = require('fs');
 import {Matrix,Vector} from 'mathlib';
-var xmlString = fs.readFileSync('data/final_approach_2.xml','utf8');
+var xmlString = fs.readFileSync('data/test.xml','utf8');
 
 describe('PNML Import', () => {
   var net: Net;
@@ -41,22 +41,22 @@ describe('PNML Import', () => {
 */
   it ('should force fire a transition', function(done) {
     this.timeout(100000);
-    net.init('Obs');//'default'
+    net.init();//'default'
     net.makeEnd('end').then( () => {
       console.log("Pnet reached end state");
       done();
     });
     /* Initial marking */
     net.ingest('start',3);
-    net.ingest('ros.AtGreenDotSpeed',100);
+    /*net.ingest('ros.AtGreenDotSpeed',100);
     net.ingest('ros.2000AGL',100);
     net.ingest('ros.VFE1',100);
     net.ingest('ros.VFE2',100);
-
-    console.log(net.getMarking().toString());
+*/
+    //console.log(net.getMarking().toString());
 
     //net.minExp(net.getMarking(),'ros.SelectFlaps3');
-    net.basisMarkings(net.getMarking(),'selectFull');
+    //net.basisMarkings(net.getMarking(),'selectFull');
     //net.fire('ros.SelectFlaps3');
     //console.log(net.getMarking().toString());
   })
