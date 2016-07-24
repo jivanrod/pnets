@@ -129,19 +129,38 @@ module petri {
 	* Class for petri net transitions
 	*/
 	export class Transition extends Node {
+		/**
+		* Execucation type of the transition
+		*/
 		protected execType: string = 'default';
-		protected executeFn: (tokens: Token[]) => Promise<string>
+
+		/**
+		* What happens when transition is activated, initiated to function returning resolved promise
+		*/
+		protected executeFn: (tokens: Token[]) => Promise<string> = () => Promise.resolve('ok');
+
+		/**
+		* Observer of incoming arcs
+		*/
 		public arcObserver: Rx.Observer<Arc>;
+
+		/**
+		* Transition constructor
+		*/
 		constructor(public name: string) {
 			super(name);
 			this.subject = new Rx.Subject();
-			// Default instantaneous transition execution
-			this.executeFn = () => { return Promise.resolve('ok');}
 		}
 
+		/**
+		* Initializion of the transition node
+		*/
 		init(execType: string) {
+			// Setting execution type
 			this.execType = execType;
 			//console.log("Initializing transition: "+this.name);
+
+			// Initializing transition's arc observer
 			this.arcObserver = Rx.Observer.create(
 				(arc: Arc) => {
 					// Iterating across input nodes to check firing
@@ -153,14 +172,17 @@ module petri {
 						return;
 						//return console.log(this.name + " would have fired in "+arc.type+" mode.");
 					}
-					// If transition enabled in Net execution mode, consume and fire.
+					// If transition enabled in Net execution mode, consume specified and fire.
 					var tokens = this.consume(arc.type);
+
+					// Perform asynchronous transition executiton
 					this.execute(tokens).then( () => {
+						// Actually fires net transition upon execution completion
 						this.fire(this.execType, true);
 					});
 				}, (err) => { console.error(err); }, () => { console.log("Done"); }
 			);
-			// Registering arc observer to all transition input arcs
+			// Registering arc observer to all input arcs
 			_.forEach(this.inputArcs, (arc: Arc) => {
 				// Subscribe to nodes
 				arc.sub = arc.observable.subscribe(this.arcObserver);
@@ -169,6 +191,7 @@ module petri {
 
 		/**
 		* Forcing transition firing (Interesting for debugging)
+		* @return Returns boolean if transition was actually enabled (useful for monitoring inacurrate nets)
 		*/
 		fire(type: string, enable: boolean = false): boolean {
 				// Checking if transition was enabled on a certain type
@@ -177,12 +200,12 @@ module petri {
 				if (!enabled){
 					console.log("Transition "+this.name+" force fired prematurely")
 				}
-				// Notifying transition observers
+				// Notifying transition observers of the fire event
 				this.subject.onNext(this.name);
 				// Feeding downstream tokens (could be done using observers)
 				_.forEach(this.outputArcs, (arc: Arc) => {
 					var tokens = _.times(arc.m, () => { return new Token() });
-					(<Place>arc.outputNode).addTokens(tokens);
+					(<Place>arc.outputNode).addTokens(tokens); // Casting node into Place
 				})
 				return enabled;
 		}
@@ -207,15 +230,16 @@ module petri {
 			return enabled;
 		}
 
+		/**
+		* Actually consumes the tokens from incoming places and return an array containing them
+		*/
 		consume(type: string = 'default'): Token[] {
 			return _.reduce(this.inputArcs, (tokens,arc) => {
 				var node = <Place>arc.inputNode;
 				return (arc.type == type) ? tokens.concat(node.consume(arc.m)) : tokens;
 			}, []);
 		}
-		/**
-		*
-		*/
+
 
 		/**
 		* Execution promise factory function for internal use only

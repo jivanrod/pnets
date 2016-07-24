@@ -1,9 +1,7 @@
 ![Build status](https://travis-ci.org/smamessier/pnets.svg?branch=master)
 
 # Pnets v 0.1
-A library for modelling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net).
-Initially inspired from  inspired from [warrenseymour/petri-net](warrenseymour/petri-net),
-it has little to do with the initial library. TypeScript has be picked as the
+A generic asynchronous library for modeling and executing [Petri Nets](http://en.wikipedia.org/wiki/Petri_net). TypeScript is used as the
 development language for scalability purposes.
 
 ## Features
