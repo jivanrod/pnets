@@ -1,6 +1,6 @@
 import {Place,Token} from '../../petri';
 import _ = require('lodash');
-import {Topic,Ros,Message} from 'ROSLIB';
+import {Topic,Ros,Message} from 'roslib';
 
 /* Don't know if useful yet
 export interface RosFloat32 {

@@ -15,6 +15,7 @@ development language for scalability purposes.
 
 ## Roadmap
 - Extensions such as Coloured, Timed and Hierarchical Nets
+- Make sure to comply with High-level petri nets part 2- https://www.iso.org/obp/ui/#iso:std:iso-iec:15909:-2:ed-1:v1:en
 
 ## Usage
 
@@ -29,6 +30,9 @@ typings install
 ```
 ### Fix Mathlib bindings
 Copy the modified TypeScript declaration file for Mathlib from `dep` directory to `typings/main/mathlib/index.d.ts`. Also go in `node_modules/mathlib` and modify the `main` field of `package.json` to `build/commonjs/Mathlib.js`. This should get the Mathlib package working together with the rest of the petri net library.
+
+### Fix Roslib bindings
+Replace `declare module "ROSLIB"` with `declare module "roslib"` to make the declaration files work with roslib vanilla npm package.
 
 ### Run test suite
 ```bash

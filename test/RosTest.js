@@ -1,7 +1,7 @@
 "use strict";
 var petri_1 = require('../src/petri');
 var fs = require('fs');
-var ROSLIB_1 = require('ROSLIB');
+var roslib_1 = require('roslib');
 var xmlString = fs.readFileSync('data/test2.xml', 'utf8');
 describe('Ros Places', function () {
     var net;
@@ -16,7 +16,7 @@ describe('Ros Places', function () {
     });
     it('should connect to ROS', function (done) {
         this.timeout(10000);
-        var ros = new ROSLIB_1.Ros({
+        var ros = new roslib_1.Ros({
             url: 'ws://192.168.56.101:9090'
         });
         ros.on('connection', function () {

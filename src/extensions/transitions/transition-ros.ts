@@ -1,6 +1,6 @@
 import {Transition,Token,Place} from '../../petri';
 import _ = require('lodash');
-import {Topic,Ros,Message} from 'ROSLIB';
+import {Topic,Ros,Message} from 'roslib';
 import {Promise} from 'es6-promise';
 
 /**

@@ -1,5 +1,5 @@
 import { Place, Token } from '../../petri';
-import { Ros } from 'ROSLIB';
+import { Ros } from 'roslib';
 export declare class RosPlace extends Place {
     private topicHandle;
     private tokenFn;

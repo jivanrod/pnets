@@ -1,5 +1,5 @@
 import { Transition } from '../../petri';
-import { Ros } from 'ROSLIB';
+import { Ros } from 'roslib';
 export declare class RosTransition extends Transition {
     private completeFn;
     private topicHandle;

@@ -1,6 +1,6 @@
 import {Net} from '../src/petri';
 import fs = require('fs');
-import {Ros} from 'ROSLIB';
+import {Ros} from 'roslib';
 var xmlString = fs.readFileSync('data/test2.xml','utf8');
 
 describe('Ros Places', () => {
@@ -9,7 +9,7 @@ describe('Ros Places', () => {
   before(function() {
     net = Net.fromPnml(xmlString);
     // Ros stuff
-    
+
     net.init();
   })
 

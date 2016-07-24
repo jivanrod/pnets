@@ -1,7 +1,7 @@
 "use strict";
 var petri_1 = require('../src/petri');
 var fs = require('fs');
-var ROSLIB_1 = require('ROSLIB');
+var roslib_1 = require('roslib');
 var place_ros_1 = require('../src/extensions/places/place-ros');
 var transition_ros_1 = require('../src/extensions/transitions/transition-ros');
 var xmlString = fs.readFileSync('data/final_approach_3.xml', 'utf8');
@@ -24,7 +24,7 @@ describe('Ros Places', function () {
     });
     it('should connect to ROS', function (done) {
         this.timeout(10000);
-        ros = new ROSLIB_1.Ros({
+        ros = new roslib_1.Ros({
             url: 'ws://192.168.56.101:9090'
         });
         ros.on('connection', function () {
@@ -39,7 +39,7 @@ describe('Ros Places', function () {
         net.init('Obs');
         var addRosObs = function (topic, type, fn, throttle) {
             if (throttle === void 0) { throttle = 1000 / rate; }
-            var tHandle = new ROSLIB_1.Topic({
+            var tHandle = new roslib_1.Topic({
                 ros: ros,
                 name: topic,
                 messageType: type,

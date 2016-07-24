@@ -1,6 +1,6 @@
 import {Net, Place, Transition, Token} from '../src/petri';
 import fs = require('fs');
-import {Ros, Message, Topic} from 'ROSLIB';
+import {Ros, Message, Topic} from 'roslib';
 import {RosPlace} from '../src/extensions/places/place-ros';
 import {RosTransition} from '../src/extensions/transitions/transition-ros';
 var xmlString = fs.readFileSync('data/final_approach_3.xml','utf8');

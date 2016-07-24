@@ -26,7 +26,8 @@
     "lodash": "~2.4.1",
     "mathlib": "^0.7.3",
     "rx": "^4.0.8",
-    "xml2js": "^0.4.16"
+    "xml2js": "^0.4.16",
+    "roslib": "^0.18"
   },
   "optionalDependencies": {
     "roslib": "~0.18.0"
