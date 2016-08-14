@@ -66,6 +66,7 @@ module petri {
 	export class Place extends Node {
 		public tokens: Token[] = [];
 		public isEnd: boolean = false;
+		public prop: () => Promise<number>; // Truth proposition promise (should return in [0,1])
 
 		constructor(public name: string) {
 			super(name);

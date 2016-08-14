@@ -28,6 +28,7 @@ declare module petri {
         name: string;
         tokens: Token[];
         isEnd: boolean;
+        prop: () => Promise<number>;
         constructor(name: string);
         protected setTokens(tokens: Token[]): void;
         addTokens(tokens: Token[]): void;
