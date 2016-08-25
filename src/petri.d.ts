@@ -34,6 +34,7 @@ declare module petri {
         addTokens(tokens: Token[]): void;
         init(): void;
         consume(m: number): Token[];
+        activationLevel(): Number;
     }
     class ConditionalPlace extends Place {
         name: string;

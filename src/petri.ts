@@ -115,6 +115,13 @@ module petri {
 			return this.tokens.splice(0,m);
 		}
 
+		/**
+		* Returns activation level of the place = number of tokens for vanilla petri nets
+		*/
+		activationLevel(): Number{
+			return this.tokens.length;
+		}
+
 	}
 
 	/**
@@ -226,7 +233,7 @@ module petri {
 		enabled(type: string = 'default') {
 			// Check that all arcs multiplicities are satisfied
 			var enabled = _.reduce(this.inputArcs, (enable,arc) => {
-				return enable && (arc.type == type) && ( (<Place>arc.inputNode).tokens.length >= arc.m)
+				return enable && (arc.type == type) && ( (<Place>arc.inputNode).activationLevel() >= arc.m)
 			}, true);
 			return enabled;
 		}
