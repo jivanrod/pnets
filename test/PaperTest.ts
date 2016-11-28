@@ -1,4 +1,5 @@
-import {Net, Place, Transition, Token} from '../src/petri';
+import {Place, Transition, Token} from '../src/petri';
+import {Net} from '../src/net';
 import fs = require('fs');
 import {Ros, Message, Topic} from 'roslib';
 import {RosPlace} from '../src/extensions/places/place-ros';
@@ -11,7 +12,7 @@ describe('Ros Places', () => {
   var rate = 50.0;
 
   before(function() {
-    net = Net.fromPnml(xmlString, {
+    net = Net.fromPnml(xmlString, "", {
       'ros': {
         place: RosPlace,
         transition: RosTransition
@@ -105,7 +106,7 @@ describe('Ros Places', () => {
     })
 
     net.ingest('start',4);
-    net.makeEnd('end').then( () => {
+    net.makeEnd('end').subscribe( (obs) => {
       console.log("Perplexity: "+1.0*net.pIndex/(1.0*net.pIndexLUT-1.0*net.pIndexFUT));
       console.log("Surprise: "+net.supriseIndex);
       done();

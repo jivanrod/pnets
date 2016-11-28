@@ -1,5 +1,5 @@
 "use strict";
-var petri_1 = require('../src/petri');
+var net_1 = require('../src/net');
 var fs = require('fs');
 var roslib_1 = require('roslib');
 var place_ros_1 = require('../src/extensions/places/place-ros');
@@ -10,7 +10,7 @@ describe('Ros Places', function () {
     var ros;
     var rate = 50.0;
     before(function () {
-        net = petri_1.Net.fromPnml(xmlString, {
+        net = net_1.Net.fromPnml(xmlString, "", {
             'ros': {
                 place: place_ros_1.RosPlace,
                 transition: transition_ros_1.RosTransition
@@ -82,7 +82,7 @@ describe('Ros Places', function () {
             }
         });
         net.ingest('start', 4);
-        net.makeEnd('end').then(function () {
+        net.makeEnd('end').subscribe(function (obs) {
             console.log("Perplexity: " + 1.0 * net.pIndex / (1.0 * net.pIndexLUT - 1.0 * net.pIndexFUT));
             console.log("Surprise: " + net.supriseIndex);
             done();

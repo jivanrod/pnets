@@ -1,4 +1,4 @@
-import {Net} from '../src/petri';
+import {Net} from '../src/net';
 import fs = require('fs');
 import {Ros} from 'roslib';
 var xmlString = fs.readFileSync('data/test2.xml','utf8');
@@ -34,7 +34,7 @@ describe('Ros Places', () => {
 
   it ('should run the net', function(done) {
     net.ingest('start',3);
-    net.makeEnd('end').then( () => {
+    net.makeEnd('end').subscribe( (obs) => {
       done();
     });
   })

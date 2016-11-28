@@ -1,5 +1,5 @@
 /// <reference path="../typings/main.d.ts" />
-import {Net} from '../src/petri';
+import {Net} from '../src/net';
 import fs = require('fs');
 import {Matrix,Vector} from 'mathlib';
 var xmlString = fs.readFileSync('data/test.xml','utf8');
@@ -42,7 +42,7 @@ describe('PNML Import', () => {
   it ('should force fire a transition', function(done) {
     this.timeout(100000);
     net.init();//'default'
-    net.makeEnd('end').then( () => {
+    net.makeEnd('end').subscribe( (obs) => {
       console.log("Pnet reached end state");
       done();
     });

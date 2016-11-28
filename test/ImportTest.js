@@ -1,11 +1,11 @@
 "use strict";
-var petri_1 = require('../src/petri');
+var net_1 = require('../src/net');
 var fs = require('fs');
 var xmlString = fs.readFileSync('data/test.xml', 'utf8');
 describe('PNML Import', function () {
     var net;
     beforeEach(function () {
-        net = petri_1.Net.fromPnml(xmlString);
+        net = net_1.Net.fromPnml(xmlString);
     });
     it('should load the XML in a Javascript object', function () {
         if (!net) {
@@ -18,7 +18,7 @@ describe('PNML Import', function () {
     it('should force fire a transition', function (done) {
         this.timeout(100000);
         net.init();
-        net.makeEnd('end').then(function () {
+        net.makeEnd('end').subscribe(function (obs) {
             console.log("Pnet reached end state");
             done();
         });

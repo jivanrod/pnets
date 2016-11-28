@@ -1,12 +1,12 @@
 "use strict";
-var petri_1 = require('../src/petri');
+var net_1 = require('../src/net');
 var fs = require('fs');
 var roslib_1 = require('roslib');
 var xmlString = fs.readFileSync('data/test2.xml', 'utf8');
 describe('Ros Places', function () {
     var net;
     before(function () {
-        net = petri_1.Net.fromPnml(xmlString);
+        net = net_1.Net.fromPnml(xmlString);
         net.init();
     });
     it('should load the XML in a Javascript object', function () {
@@ -28,7 +28,7 @@ describe('Ros Places', function () {
     });
     it('should run the net', function (done) {
         net.ingest('start', 3);
-        net.makeEnd('end').then(function () {
+        net.makeEnd('end').subscribe(function (obs) {
             done();
         });
     });

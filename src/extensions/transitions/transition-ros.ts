@@ -9,7 +9,7 @@ import {Promise} from 'es6-promise';
 export class RosTransition extends Transition{
 
   private topicHandle: any;
-  private completePromise: Promise<string>;
+  private completePromise: Rx.Observable<string>;
   private history;
 
   /**

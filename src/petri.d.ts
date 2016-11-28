@@ -1,6 +1,5 @@
 import events = require('events');
 import Rx = require('rx');
-import { Matrix, Vector } from 'mathlib';
 declare module petri {
     class Arc {
         type: string;
@@ -26,10 +25,12 @@ declare module petri {
     }
     class Place extends Node {
         name: string;
+        namespace: string;
         tokens: Token[];
         isEnd: boolean;
         prop: () => Promise<number>;
-        constructor(name: string);
+        extraSubject: Rx.Subject<Place>;
+        constructor(name: string, namespace?: string);
         protected setTokens(tokens: Token[]): void;
         addTokens(tokens: Token[]): void;
         init(): void;
@@ -42,54 +43,24 @@ declare module petri {
     }
     class Transition extends Node {
         name: string;
+        namespace: string;
         protected execType: string;
-        protected executeFn: (tokens: Token[]) => Promise<string>;
+        protected executeFn: (tokens: Token[]) => Rx.Observable<string>;
         arcObserver: Rx.Observer<Arc>;
-        constructor(name: string);
+        private activationTokens;
+        constructor(name: string, namespace?: string);
         init(execType: string): void;
         fire(type: string, enable?: boolean): boolean;
-        implement(fn: (tokens: Token[]) => Promise<string>): void;
+        implement(fn: (tokens: Token[]) => Rx.Observable<string>): void;
         enabled(type?: string): boolean;
         consume(type?: string): Token[];
-        execute(tokens: Token[]): Promise<string>;
+        execute(tokens: Token[]): Rx.Observable<string>;
+        dispatch(agentNode: Place): void;
+        dispatchable(): boolean;
     }
     class TimedTransition extends Transition {
         private duration;
         constructor(name: string, duration: number);
-    }
-    class Net {
-        transitions: Transition[];
-        places: Place[];
-        arcs: Arc[];
-        Pre: Matrix;
-        Post: Matrix;
-        C: Matrix;
-        perplex: number;
-        arcSubject: Rx.Subject<any>;
-        transitionSubject: Rx.Subject<any>;
-        supriseIndex: number;
-        pIndex: number;
-        pIndexLUT: number;
-        pIndexFUT: number;
-        constructor();
-        init(execType?: string): void;
-        makeEnd(endPlace: string): Rx.IPromise<any>;
-        findNode(nodeId: string): {
-            node: Node;
-            type: string;
-            index: number;
-        };
-        addPlace(pHandle: Place): void;
-        addTransition(tHandle: Transition): void;
-        addArc(sourceId: string, targetId: string, m: number): void;
-        fire(nodeId: string, update?: boolean, type?: string): void;
-        ingest(nodeId: string, count?: number): void;
-        buildMath(): void;
-        getMarking(): Vector;
-        setMarking(M: Vector): void;
-        minExp(M: Vector, t: string): Vector[];
-        basisMarkings(M0: Vector, t: string): any[];
-        static fromPnml(xmlString: string, extensions?: any): Net;
     }
 }
 export = petri;
