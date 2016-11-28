@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><pnml>
+<net id="Net-One" type="P/T net">
+<token id="Default" enabled="true" red="0" green="0" blue="0"/>
+<place id="At 10000 feet">
+<graphics>
+<position x="465.0" y="120.0"/>
+</graphics>
+<name>
+<value>At 10000 feet</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="Cleared">
+<graphics>
+<position x="300.0" y="120.0"/>
+</graphics>
+<name>
+<value>Cleared</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="Cleared_A">
+<graphics>
+<position x="465.0" y="195.0"/>
+</graphics>
+<name>
+<value>Cleared_A</value>
+<graphics>
+<offset x="50.00000000000001" y="47.28571428571429"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="Cleared_L">
+<graphics>
+<position x="630.0" y="195.0"/>
+</graphics>
+<name>
+<value>Cleared_L</value>
+<graphics>
+<offset x="82.0" y="55.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="Configured">
+<graphics>
+<position x="630.0" y="120.0"/>
+</graphics>
+<name>
+<value>Configured</value>
+<graphics>
+<offset x="76.0" y="-9.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="end">
+<graphics>
+<position x="795.0" y="150.0"/>
+</graphics>
+<name>
+<value>end</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<place id="start">
+<graphics>
+<position x="300.0" y="195.0"/>
+</graphics>
+<name>
+<value>start</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</name>
+<initialMarking>
+<value>Default,0</value>
+<graphics>
+<offset x="0.0" y="0.0"/>
+</graphics>
+</initialMarking>
+<capacity>
+<value>0</value>
+</capacity>
+</place>
+<transition id="Approach">
+<graphics>
+<position x="555.0" y="150.0"/>
+</graphics>
+<name>
+<value>Approach</value>
+<graphics>
+<offset x="46.0" y="55.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="Descend">
+<graphics>
+<position x="390.0" y="150.0"/>
+</graphics>
+<name>
+<value>Descend</value>
+<graphics>
+<offset x="31.0" y="60.0"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<transition id="Land">
+<graphics>
+<position x="720.0" y="150.0"/>
+</graphics>
+<name>
+<value>Land</value>
+<graphics>
+<offset x="25.857142857142854" y="-10.142857142857153"/>
+</graphics>
+</name>
+<orientation>
+<value>0</value>
+</orientation>
+<rate>
+<value>1.0</value>
+</rate>
+<timed>
+<value>true</value>
+</timed>
+<infiniteServer>
+<value>false</value>
+</infiniteServer>
+<priority>
+<value>1</value>
+</priority>
+</transition>
+<arc id="Approach to Cleared_L" source="Approach" target="Cleared_L">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="571" y="167" curvePoint="false"/>
+<arcpath id="001" x="628" y="199" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Approach to Configured" source="Approach" target="Configured">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="572" y="157" curvePoint="false"/>
+<arcpath id="001" x="627" y="137" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="At 10000 feet to Approach" source="At 10000 feet" target="Approach">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="491" y="136" curvePoint="false"/>
+<arcpath id="001" x="562" y="157" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Cleared_A to Approach" source="Cleared_A" target="Approach">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="490" y="200" curvePoint="false"/>
+<arcpath id="001" x="561" y="167" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Cleared_L to Land" source="Cleared_L" target="Land">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="655" y="200" curvePoint="false"/>
+<arcpath id="001" x="726" y="167" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Cleared to Descend" source="Cleared" target="Descend">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="326" y="136" curvePoint="false"/>
+<arcpath id="001" x="397" y="157" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Configured to Land" source="Configured" target="Land">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="656" y="136" curvePoint="false"/>
+<arcpath id="001" x="727" y="157" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Descend to At 10000 feet" source="Descend" target="At 10000 feet">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="407" y="157" curvePoint="false"/>
+<arcpath id="001" x="462" y="137" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Descend to Cleared_A" source="Descend" target="Cleared_A">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="406" y="167" curvePoint="false"/>
+<arcpath id="001" x="463" y="199" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="Land to end" source="Land" target="end">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="736" y="162" curvePoint="false"/>
+<arcpath id="001" x="792" y="162" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+<arc id="start to Descend" source="start" target="Descend">
+<graphics/>
+<inscription>
+<value>Default,1</value>
+<graphics/>
+</inscription>
+<tagged>
+<value>false</value>
+</tagged>
+<arcpath id="000" x="325" y="200" curvePoint="false"/>
+<arcpath id="001" x="396" y="167" curvePoint="false"/>
+<type value="normal"/>
+</arc>
+</net>
+</pnml>
