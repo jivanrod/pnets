@@ -54,6 +54,10 @@ module petri {
 			this.type = type;
 		}
 
+		clone(){
+			return new Token(this.type);
+		}
+
 		public type: string = 'default'
 	}
 
@@ -102,7 +106,8 @@ module petri {
 		* Add tokens to place and notifies downstream transitions
 		* @param tokens Array of tokens to be added
 		*/
-		addTokens(tokens: Token[]) {
+		addTokens(token: Token, n: number) {
+			var tokens = 	_.times(n, () => { return token.clone() });
 			this.tokens = this.tokens.concat(tokens);
 			//console.log("Added "+tokens.length+" tokens to place: "+this.name+" (Total:"+this.tokens.length+")");
 			this.extraSubject.onNext(this);
@@ -132,7 +137,7 @@ module petri {
 		/**
 		* Returns activation level of the place = number of tokens for vanilla petri nets
 		*/
-		activationLevel(): Number{
+		activationLevel(): number{
 			return this.tokens.length;
 		}
 
@@ -190,7 +195,7 @@ module petri {
 					// Iterating across input nodes to check firing
 					var enabled = this.enabled(arc.type);
 					// If conditions not satisfied, do nothing
-					if (!enabled) {
+					if (!enabled.fire) {
 						return;
 					}
 					// If transition enabled but Net in other execution mode, log
@@ -204,7 +209,7 @@ module petri {
 					// Perform asynchronous transition execution
 					this.execute(tokens).subscribe( () => {
 						// Actually fires net transition upon execution completion
-						this.fire(this.execType, true);
+						this.fire(this.execType, enabled.result, true);
 					});
 				}, (err) => { console.error(err); }, () => { console.log("Done"); }
 			);
@@ -219,21 +224,18 @@ module petri {
 		* Forcing transition firing (Interesting for debugging)
 		* @return Returns boolean if transition was actually enabled (useful for monitoring inacurrate nets)
 		*/
-		fire(type: string, enable: boolean = false): boolean {
+		fire(type: string, coeff: number = 1, enable: boolean = false): boolean {
 				// Checking if transition was enabled on a certain type
-				var enabled = this.enabled(type) || enable;
+				var enabled = this.enabled(type).fire || enable;
 				// If not enabled, we file a mismatch
-				if (!enabled){
-					console.log("Transition "+this.name+" force fired prematurely")
-				}
+				this.processFireEvent(enabled);
 				// Notifying transition observers of the fire event
 				this.subject.onNext(this.name);
 				// Feeding downstream tokens (could be done using observers)
 				_.forEach(this.outputArcs, (arc: Arc) => {
 					// Only feeding downstream nodes through arcs of firing type
 					if (arc.type != type) { return; }
-					var tokens = _.times(arc.m, () => { return new Token() });
-					(<Place>arc.outputNode).addTokens(tokens); // Casting node into Place
+					(<Place>arc.outputNode).addTokens(new Token, arc.m*coeff); // Casting node into Place
 				})
 				return enabled;
 		}
@@ -255,7 +257,10 @@ module petri {
 			var enabled = _.reduce(this.inputArcs, (enable,arc) => {
 				return enable && (arc.type == type) && ( (<Place>arc.inputNode).activationLevel() >= arc.m)
 			}, true);
-			return enabled;
+			return {
+				fire: enabled,
+				result: 1.0
+			};
 		}
 
 		/**
@@ -279,6 +284,12 @@ module petri {
 				throw new Error("Non validation transition execution promise")
 			}
 			return this.executeFn(tokens)
+		}
+
+		processFireEvent(enableParams: any){
+			if (!enableParams.fire){
+				console.log("Transition "+this.name+" force fired prematurely");
+			}
 		}
 
 		dispatch(agentNode: Place) {}

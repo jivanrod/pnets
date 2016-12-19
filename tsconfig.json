@@ -21,11 +21,13 @@
         "src/extensions/transitions/transition-ros.ts",
         "src/extensions/transitions/transition-subnet.ts",
         "src/net.ts",
+        "src/afpn.ts",
         "src/petri.ts",
         "test/ImportTest.ts",
         "test/PaperTest.ts",
         "test/RosTest.ts",
         "test/AIAA.ts",
+        "test/AFPNTest.ts",
         "typings/main.d.ts"
     ],
     "atom": {

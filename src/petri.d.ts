@@ -13,6 +13,7 @@ declare module petri {
     }
     class Token {
         constructor(type?: string);
+        clone(): Token;
         type: string;
     }
     class Node extends events.EventEmitter {
@@ -32,10 +33,10 @@ declare module petri {
         extraSubject: Rx.Subject<Place>;
         constructor(name: string, namespace?: string);
         protected setTokens(tokens: Token[]): void;
-        addTokens(tokens: Token[]): void;
+        addTokens(token: Token, n: number): void;
         init(): void;
         consume(m: number): Token[];
-        activationLevel(): Number;
+        activationLevel(): number;
     }
     class ConditionalPlace extends Place {
         name: string;
@@ -50,11 +51,15 @@ declare module petri {
         private activationTokens;
         constructor(name: string, namespace?: string);
         init(execType: string): void;
-        fire(type: string, enable?: boolean): boolean;
+        fire(type: string, coeff?: number, enable?: boolean): boolean;
         implement(fn: (tokens: Token[]) => Rx.Observable<string>): void;
-        enabled(type?: string): boolean;
+        enabled(type?: string): {
+            fire: boolean;
+            result: number;
+        };
         consume(type?: string): Token[];
         execute(tokens: Token[]): Rx.Observable<string>;
+        processFireEvent(enableParams: any): void;
         dispatch(agentNode: Place): void;
         dispatchable(): boolean;
     }

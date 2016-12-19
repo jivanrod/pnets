@@ -14,7 +14,8 @@
   "scripts": {
     "pretest": "tsc",
     "test": "mocha test/ImportTest.js",
-    "aiaa": "node test/AIAA.js"
+    "aiaa": "node test/AIAA.js",
+    "afpn": "mocha test/AFPNTest.js"
   },
   "author": {
     "name": "Sebastien Mamessier",
